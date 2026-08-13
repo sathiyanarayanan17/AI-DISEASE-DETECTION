@@ -8,7 +8,7 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-/* ── Tamil Nadu District Coordinates (37 districts) ──────── */
+/* -- Tamil Nadu District Coordinates (37 districts) -- */
 export const DISTRICT_COORDS = {
   Chennai:          [13.08,  80.27],
   Coimbatore:       [11.00,  76.96],
@@ -53,7 +53,7 @@ export const DISTRICT_STATE = Object.fromEntries(
   Object.keys(DISTRICT_COORDS).map((d) => [d, d === 'Puducherry' ? 'Puducherry (UT)' : 'Tamil Nadu'])
 );
 
-/* ── Helpers ─────────────────────────────────────────────── */
+/* -- Helpers -- */
 function scoreToRisk(score) {
   if (score >= 70) return 'High';
   if (score >= 40) return 'Medium';
@@ -68,7 +68,7 @@ function riskRecommendation(level, district) {
   return `Routine surveillance sufficient for ${district}. Maintain standard vector control and sanitation protocols.`;
 }
 
-/* ── Mock data (37 TN districts) ─────────────────────────── */
+/* -- Mock data (37 TN districts) -- */
 const MOCK_SCORES = [
   82, 65, 74, 55, 45, 38, 71, 58, 89, 62,
   44, 76, 51, 67, 33, 42, 79, 85, 61, 37,
@@ -93,8 +93,8 @@ export const MOCK_DISTRICTS = Object.keys(DISTRICT_COORDS).map((name, i) => {
   };
 });
 
-/* ── Mock 30-day history for a district ─────────────────── */
-function generateMockHistory(district, days = 30) {
+/* -- Mock 30-day history for a district -- */
+export function generateMockHistory(district, days = 30) {
   const data = [];
   const snap = MOCK_DISTRICTS.find((d) => d.district === district);
   let score = snap ? snap.risk_score * 0.85 : 50;
@@ -125,7 +125,7 @@ function generateMockHistory(district, days = 30) {
   return data;
 }
 
-/* ── API functions ───────────────────────────────────────── */
+/* -- API functions -- */
 
 /** POST /predict/batch - all 37 TN districts */
 export const getAllPredictions = async () => {
@@ -249,6 +249,133 @@ export const connectWebSocket = (onMessage, onError) => {
     return ws;
   } catch {
     return null;
+  }
+};
+
+/** GET /forecast?district=X - 7 day forecast */
+export const getForecast = async (district) => {
+  try {
+    const response = await api.get('/forecast', { params: { district } });
+    return response.data;
+  } catch {
+    // Generate mock 7-day forecast
+    const snap = MOCK_DISTRICTS.find(d => d.district === district);
+    const baseScore = snap ? snap.risk_score : 50;
+    const data = [];
+    const now = new Date();
+    for (let i = 1; i <= 7; i++) {
+      const d = new Date(now);
+      d.setDate(d.getDate() + i);
+      const drift = (Math.random() - 0.4) * 8;
+      const score = Math.max(5, Math.min(98, baseScore + drift * i * 0.5));
+      data.push({
+        date: d.toISOString().split('T')[0],
+        risk_score: parseFloat(score.toFixed(1)),
+        confidence_low: parseFloat(Math.max(0, score - 10 - Math.random() * 5).toFixed(1)),
+        confidence_high: parseFloat(Math.min(100, score + 10 + Math.random() * 5).toFixed(1)),
+        temperature: parseFloat((29 + Math.random() * 5).toFixed(1)),
+        rainfall: parseFloat((5 + Math.random() * 40).toFixed(1)),
+        humidity: parseFloat((60 + Math.random() * 25).toFixed(1)),
+        weather_condition: ['Sunny', 'Partly Cloudy', 'Rainy', 'Overcast', 'Thunderstorm'][Math.floor(Math.random() * 5)],
+      });
+    }
+    return data;
+  }
+};
+
+/** POST /citizen/report */
+export const submitCitizenReport = async (data) => {
+  try {
+    const response = await api.post('/citizen/report', data);
+    return response.data;
+  } catch {
+    // Mock success
+    return { success: true, report_id: 'RPT-' + Date.now(), message: 'Report submitted successfully' };
+  }
+};
+
+/** GET /resources?workers=X */
+export const getResourceAllocation = async (workers) => {
+  try {
+    const response = await api.get('/resources', { params: { workers } });
+    return response.data;
+  } catch {
+    // Mock resource allocation
+    const highRisk = MOCK_DISTRICTS.filter(d => d.risk_level === 'High');
+    const totalScore = highRisk.reduce((s, d) => s + d.risk_score, 0);
+    const allocations = highRisk.map(d => ({
+      district: d.district,
+      workers_allocated: Math.max(1, Math.round((d.risk_score / totalScore) * workers)),
+      risk_score: d.risk_score,
+      priority: 'Critical',
+    }));
+    return {
+      allocations,
+      total_workers: workers,
+      coverage: '87%',
+      hospitals: highRisk.map(d => ({
+        district: d.district,
+        beds_total: 200 + Math.floor(Math.random() * 300),
+        beds_available: 20 + Math.floor(Math.random() * 80),
+        icu_available: Math.floor(Math.random() * 10),
+      })),
+    };
+  }
+};
+
+/** GET /disease/:disease - disease specific data */
+export const getDiseaseData = async (disease) => {
+  try {
+    const response = await api.get(`/disease/${disease}`);
+    return response.data;
+  } catch {
+    // Mock disease data
+    const districts = Object.keys(DISTRICT_COORDS);
+    const top10 = districts.slice(0, 10).map((d, i) => ({
+      district: d,
+      cases: Math.floor(Math.random() * 200) + 50,
+      trend: Math.random() > 0.5 ? 'rising' : 'declining',
+      last_updated: new Date().toISOString().split('T')[0],
+    })).sort((a, b) => b.cases - a.cases);
+
+    const trend90 = [];
+    const now = new Date();
+    let baseCases = 50;
+    for (let i = 89; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      baseCases = Math.max(5, baseCases + (Math.random() - 0.45) * 10);
+      trend90.push({
+        date: d.toISOString().split('T')[0],
+        cases: Math.round(baseCases),
+      });
+    }
+
+    return {
+      disease,
+      total_cases: top10.reduce((s, d) => s + d.cases, 0),
+      trend: 'rising',
+      peak_month: 'November',
+      top_districts: top10,
+      trend_90d: trend90,
+    };
+  }
+};
+
+/** GET /compare?d1=X&d2=Y */
+export const getCompareData = async (d1, d2) => {
+  try {
+    const response = await api.get('/compare', { params: { d1, d2 } });
+    return response.data;
+  } catch {
+    const h1 = generateMockHistory(d1, 30);
+    const h2 = generateMockHistory(d2, 30);
+    const snap1 = MOCK_DISTRICTS.find(d => d.district === d1) || MOCK_DISTRICTS[0];
+    const snap2 = MOCK_DISTRICTS.find(d => d.district === d2) || MOCK_DISTRICTS[1];
+    return {
+      district1: { ...snap1, history: h1 },
+      district2: { ...snap2, history: h2 },
+    };
   }
 };
 

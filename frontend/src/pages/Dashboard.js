@@ -243,6 +243,9 @@ export default function Dashboard({ districts = [], loading }) {
       <DiseaseBreakdown districts={districts} />
       <RiskMap districts={districts} />
       <DistrictTable districts={districts} onRowClick={n => nav(`/district/${encodeURIComponent(n)}`)} />
+      <div style={{ textAlign: 'right', fontSize: '0.72rem', color: '#334155', marginTop: 18 }}>
+        Last refreshed: {new Date().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'medium' })}
+      </div>
     </>
   );
 }

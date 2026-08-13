@@ -47,6 +47,10 @@ from routes.history import router as history_router      # noqa: E402
 from routes.analytics import router as analytics_router  # noqa: E402
 from routes.realtime import router as realtime_router    # noqa: E402
 from routes.realtime import add_data_point               # noqa: E402
+from routes.forecast import router as forecast_router    # noqa: E402
+from routes.citizen import router as citizen_router      # noqa: E402
+from routes.resources import router as resources_router  # noqa: E402
+from routes.disease import router as disease_router      # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Application state
@@ -63,7 +67,8 @@ app = FastAPI(
     description=(
         "AI-powered Early Warning System for disease outbreak prediction "
         "across Tamil Nadu districts. Provides risk predictions, active alerts, "
-        "historical trend data, analytics, and real-time data ingestion."
+        "historical trend data, analytics, real-time data ingestion, forecasting, "
+        "citizen reporting, resource allocation, and disease-specific analysis."
     ),
     docs_url="/docs",
     redoc_url="/redoc",
@@ -88,6 +93,10 @@ app.include_router(alerts_router, prefix="/alerts")
 app.include_router(history_router, prefix="/history")
 app.include_router(analytics_router, prefix="/analytics")
 app.include_router(realtime_router, prefix="/realtime")
+app.include_router(forecast_router, prefix="/forecast")
+app.include_router(citizen_router, prefix="/citizen")
+app.include_router(resources_router, prefix="/resources")
+app.include_router(disease_router, prefix="/disease")
 
 
 # ---------------------------------------------------------------------------
@@ -241,6 +250,14 @@ def root() -> dict:
             {"path": "/analytics/trends", "description": "Disease trends over time (GET)"},
             {"path": "/realtime/latest", "description": "Latest simulated weather readings (GET)"},
             {"path": "/realtime/feed", "description": "Last 20 data points (GET)"},
+            {"path": "/realtime/districts", "description": "All monitored districts (GET)"},
+            {"path": "/forecast", "description": "Multi-day risk forecast for a district (GET)"},
+            {"path": "/citizen/report", "description": "Submit citizen symptom report (POST)"},
+            {"path": "/citizen/reports", "description": "View recent citizen reports (GET)"},
+            {"path": "/citizen/stats", "description": "Citizen report statistics (GET)"},
+            {"path": "/resources/allocate", "description": "AI-powered resource allocation (GET)"},
+            {"path": "/resources/hospitals", "description": "Hospital data per district (GET)"},
+            {"path": "/disease/{name}", "description": "Disease-specific data: dengue, cholera, malaria (GET)"},
             {"path": "/ws", "description": "WebSocket for real-time updates"},
             {"path": "/health", "description": "Health check (GET)"},
             {"path": "/docs", "description": "Interactive Swagger UI documentation (GET)"},
