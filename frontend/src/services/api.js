@@ -379,4 +379,24 @@ export const getCompareData = async (d1, d2) => {
   }
 };
 
+/** GET /analytics/anomalies */
+export const getAnomalies = async () => {
+  try {
+    const r = await api.get('/analytics/anomalies');
+    return r.data;
+  } catch {
+    return [];
+  }
+};
+
+/** GET /forecast?district=X&days=14 - outbreak probability */
+export const getOutbreakProbability = async (district) => {
+  try {
+    const r = await api.get('/forecast', { params: { district, days: 14 } });
+    return r.data;
+  } catch {
+    return [];
+  }
+};
+
 export default api;
