@@ -1,0 +1,145 @@
+{
+  "model_type": "XGBoost",
+  "accuracy": 0.9623414884078392,
+  "f1_macro": 0.9595845017435364,
+  "f1_weighted": 0.9623169981153157,
+  "precision_macro": 0.9600076715990736,
+  "recall_macro": 0.9592115848377022,
+  "confusion_matrix": [
+    [
+      894,
+      50,
+      0
+    ],
+    [
+      44,
+      3579,
+      121
+    ],
+    [
+      0,
+      79,
+      3040
+    ]
+  ],
+  "classification_report": {
+    "Low": {
+      "precision": 0.9530916844349681,
+      "recall": 0.9470338983050848,
+      "f1-score": 0.9500531349628055,
+      "support": 944.0
+    },
+    "Medium": {
+      "precision": 0.9652103559870551,
+      "recall": 0.9559294871794872,
+      "f1-score": 0.9605475040257649,
+      "support": 3744.0
+    },
+    "High": {
+      "precision": 0.9617209743751978,
+      "recall": 0.9746713690285348,
+      "f1-score": 0.9681528662420382,
+      "support": 3119.0
+    },
+    "accuracy": 0.9623414884078392,
+    "macro avg": {
+      "precision": 0.9600076715990736,
+      "recall": 0.9592115848377022,
+      "f1-score": 0.9595845017435364,
+      "support": 7807.0
+    },
+    "weighted avg": {
+      "precision": 0.9623509468423703,
+      "recall": 0.9623414884078392,
+      "f1-score": 0.9623169981153157,
+      "support": 7807.0
+    }
+  },
+  "auc_ovr": 0.9970613023998558,
+  "auc_class_Low": 0.9984947532457269,
+  "auc_class_Medium": 0.9950021272858462,
+  "auc_class_High": 0.9976870266679944,
+  "feature_columns": [
+    "rainfall_mm",
+    "temperature_c",
+    "humidity_pct",
+    "rolling_7d_cases",
+    "rolling_14d_cases",
+    "rolling_30d_cases",
+    "lag_7_cases",
+    "lag_14_cases",
+    "lag_21_cases",
+    "case_trend_7d",
+    "cholera_cases_7d_avg",
+    "dengue_cases_7d_avg",
+    "malaria_cases_7d_avg",
+    "rainfall_7d_avg",
+    "rainfall_14d_avg",
+    "temp_7d_avg",
+    "humidity_7d_avg",
+    "month",
+    "week_of_year",
+    "day_of_year",
+    "is_sw_monsoon",
+    "is_ne_monsoon",
+    "is_coastal",
+    "is_urban",
+    "is_hill"
+  ],
+  "label_map": {
+    "0": "Low",
+    "1": "Medium",
+    "2": "High"
+  },
+  "districts": [
+    "Ariyalur",
+    "Chengalpattu",
+    "Chennai",
+    "Coimbatore",
+    "Cuddalore",
+    "Dharmapuri",
+    "Dindigul",
+    "Erode",
+    "Kallakurichi",
+    "Kancheepuram",
+    "Kanyakumari",
+    "Karur",
+    "Krishnagiri",
+    "Madurai",
+    "Mayiladuthurai",
+    "Nagapattinam",
+    "Namakkal",
+    "Nilgiris",
+    "Perambalur",
+    "Puducherry",
+    "Pudukkottai",
+    "Ramanathapuram",
+    "Ranipet",
+    "Salem",
+    "Sivagangai",
+    "Tenkasi",
+    "Thanjavur",
+    "Thoothukudi",
+    "Tiruchirappalli",
+    "Tirunelveli",
+    "Tirupattur",
+    "Tiruppur",
+    "Tiruvannamalai",
+    "Tiruvarur",
+    "Vellore",
+    "Villupuram",
+    "Virudhunagar"
+  ],
+  "trained_on": "2026-08-13 13:48:23",
+  "best_params": {
+    "n_estimators": 500,
+    "max_depth": 6,
+    "learning_rate": 0.05,
+    "subsample": 0.8,
+    "colsample_bytree": 0.8,
+    "min_child_weight": 3,
+    "gamma": 0.1,
+    "reg_alpha": 0.1,
+    "reg_lambda": 1.0
+  }
+}

@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.env
+
+# Model files (large)
+models/*.pkl
+models/plots/
+
+# Data files (large, generated)
+data/*.csv
+data/logs/
+
+# Build
+frontend/build/
+dist/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+pipeline_log.txt
+out.txt
+err.txt
+
+# Debug files
+debug_pipeline.py
