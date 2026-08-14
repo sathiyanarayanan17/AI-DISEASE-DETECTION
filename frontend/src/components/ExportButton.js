@@ -31,7 +31,7 @@ export default function ExportButton({ data, filename, columns }) {
       style={{ fontSize: '0.74rem', padding: '6px 14px' }}
       title="Export as CSV"
     >
-      📥 Export CSV
+      Export CSV
     </button>
   );
 }

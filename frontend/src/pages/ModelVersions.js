@@ -39,28 +39,28 @@ export default function ModelVersions() {
       {/* Stats */}
       <div className="stats-row">
         <div className="stat-card">
-          <div className="stat-icon-wrap si-blue">🧠</div>
+          <div className="stat-icon-wrap si-blue"></div>
           <div>
             <div className="stat-num">{MODEL_VERSIONS.length}</div>
             <div className="stat-lbl">Total Versions</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-green">✓</div>
+          <div className="stat-icon-wrap si-green"></div>
           <div>
             <div className="stat-num">{MODEL_VERSIONS.find(v => v.status === 'Active')?.version}</div>
             <div className="stat-lbl">Active Version</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-amber">📊</div>
+          <div className="stat-icon-wrap si-amber"></div>
           <div>
             <div className="stat-num">{MODEL_VERSIONS[MODEL_VERSIONS.length - 1].f1}</div>
             <div className="stat-lbl">Current F1</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-red">📈</div>
+          <div className="stat-icon-wrap si-red"></div>
           <div>
             <div className="stat-num">{MODEL_VERSIONS[MODEL_VERSIONS.length - 1].auc}</div>
             <div className="stat-lbl">Current AUC</div>
@@ -75,7 +75,7 @@ export default function ModelVersions() {
           <div style={{ display: 'flex', gap: 10 }}>
             {retrainSuccess && <span className="pill pill-green">Retrain Successful!</span>}
             <button className="btn-detail" onClick={handleRetrain} disabled={retraining}>
-              {retraining ? '⏳ Retraining...' : '🔄 Retrain Model'}
+              {retraining ? 'Retraining...' : 'Retrain Model'}
             </button>
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function ModelVersions() {
                     <td style={{ fontSize: '0.8rem' }}>{v.samples.toLocaleString()}</td>
                     <td>
                       <span className={v.status === 'Active' ? 'badge badge-low' : 'badge badge-medium'}>
-                        {v.status === 'Active' ? '✓' : '◈'} {v.status}
+                        {v.status === 'Active' ? 'OK' : '-'} {v.status}
                       </span>
                     </td>
                     <td style={{ fontSize: '0.76rem', color: 'var(--text2)', maxWidth: 220 }}>{v.notes}</td>

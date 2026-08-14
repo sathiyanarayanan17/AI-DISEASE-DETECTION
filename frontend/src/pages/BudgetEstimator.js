@@ -103,28 +103,28 @@ export default function BudgetEstimator() {
       {/* Cost Breakdown Cards */}
       <div className="stats-row" style={{ marginBottom: 20 }}>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-red">💊</div>
+          <div className="stat-icon-wrap si-red"></div>
           <div>
             <div className="stat-num" style={{ fontSize: '1.3rem' }}>{formatRupees(costs.medical)}</div>
             <div className="stat-lbl">Medical Supplies</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-blue">👨‍⚕</div>
+          <div className="stat-icon-wrap si-blue"></div>
           <div>
             <div className="stat-num" style={{ fontSize: '1.3rem' }}>{formatRupees(costs.personnel)}</div>
             <div className="stat-lbl">Personnel Deployment</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-amber">🧪</div>
+          <div className="stat-icon-wrap si-amber"></div>
           <div>
             <div className="stat-num" style={{ fontSize: '1.3rem' }}>{formatRupees(costs.testing)}</div>
             <div className="stat-lbl">Testing Kits</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-green">🚑</div>
+          <div className="stat-icon-wrap si-green"></div>
           <div>
             <div className="stat-num" style={{ fontSize: '1.3rem' }}>{formatRupees(costs.transport)}</div>
             <div className="stat-lbl">Transportation</div>

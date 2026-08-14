@@ -42,9 +42,9 @@ function Sparkline({ data, color }) {
 }
 
 function getMedal(rank) {
-  if (rank === 1) return '🥇';
-  if (rank === 2) return '🥈';
-  if (rank === 3) return '🥉';
+  if (rank === 1) return '#1';
+  if (rank === 2) return '#2';
+  if (rank === 3) return '#3';
   if (rank === 4) return '4';
   if (rank === 5) return '5';
   return '';

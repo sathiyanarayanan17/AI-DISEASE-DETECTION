@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 
 const ROLES = [
-  { value: 'health_officer', label: 'Health Officer', icon: '🏥', access: ['District dashboards', 'Real-time alerts', 'Resource allocation', 'Citizen reports'] },
-  { value: 'state_admin', label: 'State Admin', icon: '🏛', access: ['All district data', 'Model management', 'Budget estimator', 'Audit trail', 'System settings'] },
-  { value: 'public', label: 'Public', icon: '👤', access: ['Prevention tips', 'District risk overview', 'Citizen report submission', 'WhatsApp bot'] },
+  { value: 'health_officer', label: 'Health Officer', icon: '', access: ['District dashboards', 'Real-time alerts', 'Resource allocation', 'Citizen reports'] },
+  { value: 'state_admin', label: 'State Admin', icon: '', access: ['All district data', 'Model management', 'Budget estimator', 'Audit trail', 'System settings'] },
+  { value: 'public', label: 'Public', icon: '', access: ['Prevention tips', 'District risk overview', 'Citizen report submission', 'WhatsApp bot'] },
 ];
 
 export default function LoginPage() {
@@ -42,7 +42,7 @@ export default function LoginPage() {
         {/* Welcome Card */}
         <div className="card" style={{ marginBottom: 20 }}>
           <div className="card-body" style={{ textAlign: 'center', padding: 40 }}>
-            <div style={{ fontSize: '3rem', marginBottom: 12 }}>{roleInfo?.icon || '👤'}</div>
+            <div style={{ fontSize: '3rem', marginBottom: 12 }}>{roleInfo?.icon || ''}</div>
             <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text1)', marginBottom: 6 }}>
               Welcome, {currentUser}!
             </h2>
@@ -74,7 +74,7 @@ export default function LoginPage() {
                 )}
                 <ul style={{ textAlign: 'left', fontSize: '0.78rem', color: 'var(--text2)', lineHeight: 2, listStyle: 'none', padding: 0 }}>
                   {r.access.map((item, i) => (
-                    <li key={i}>✓ {item}</li>
+                    <li key={i}>{item}</li>
                   ))}
                 </ul>
               </div>
@@ -98,7 +98,7 @@ export default function LoginPage() {
               margin: '0 auto 14px', fontSize: '1.5rem',
               boxShadow: '0 4px 12px rgba(99,102,241,0.3)',
             }}>
-              🛡
+              EA
             </div>
             <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', marginBottom: 4 }}>
               EarlyAlert Login

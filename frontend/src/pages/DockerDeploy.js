@@ -80,21 +80,21 @@ const CHECKLIST_ITEMS = [
 const CLOUD_PROVIDERS = [
   {
     name: 'AWS',
-    icon: '☁',
+    icon: '',
     services: ['ECS Fargate', 'RDS PostgreSQL', 'ElastiCache', 'S3', 'CloudFront'],
     estimatedCost: 'Rs 8,000 - 15,000/month',
     pros: ['Best ML/AI integration', 'SES for email', 'India regions available'],
   },
   {
     name: 'GCP',
-    icon: '🌐',
+    icon: '',
     services: ['Cloud Run', 'Cloud SQL', 'Memorystore', 'GCS', 'Cloud CDN'],
     estimatedCost: 'Rs 7,000 - 12,000/month',
     pros: ['Free tier generous', 'BigQuery for analytics', 'Vertex AI integration'],
   },
   {
     name: 'Azure',
-    icon: '🔷',
+    icon: '',
     services: ['Container Apps', 'Azure DB', 'Azure Cache', 'Blob Storage', 'Azure CDN'],
     estimatedCost: 'Rs 9,000 - 16,000/month',
     pros: ['Government compliance', 'Azure ML Studio', 'India data residency'],
@@ -128,7 +128,7 @@ export default function DockerDeploy() {
             <p style={{ fontSize: '0.8rem', color: 'var(--text3)', margin: '4px 0 0' }}>Docker-based deployment for EarlyAlert system</p>
           </div>
           <span className="badge badge-low" style={{ fontSize: '0.78rem', padding: '6px 14px' }}>
-            ✓ Ready for Production
+            Ready for Production
           </span>
         </div>
       </div>
@@ -183,7 +183,7 @@ export default function DockerDeploy() {
         <div className="card-head">
           <h3 className="card-head-title">docker-compose.yml</h3>
           <button className="btn-detail" onClick={copyDockerCompose}>
-            {copied ? '✓ Copied!' : '📋 Copy'}
+            {copied ? 'Copied!' : 'Copy'}
           </button>
         </div>
         <div className="card-body">

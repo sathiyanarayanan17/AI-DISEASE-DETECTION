@@ -23,11 +23,11 @@ function fmtDate(iso) {
 }
 
 const WEATHER_ICONS = {
-  'Sunny': '☀',
-  'Partly Cloudy': '⛅',
-  'Rainy': '🌧',
-  'Overcast': '☁',
-  'Thunderstorm': '⛈',
+  'Sunny': 'Sun',
+  'Partly Cloudy': 'P.Cloud',
+  'Rainy': 'Rain',
+  'Overcast': 'Cloud',
+  'Thunderstorm': 'Storm',
 };
 
 export default function Forecast() {
@@ -103,7 +103,7 @@ export default function Forecast() {
           alignItems: 'center',
           gap: 14,
         }}>
-          <span style={{ fontSize: '1.8rem' }}>🚨</span>
+          <span style={{ fontSize: '1.8rem', color: '#ef4444', fontWeight: 700 }}>ALERT</span>
           <div>
             <div style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fca5a5', marginBottom: 4 }}>
               AI Predicts Potential Outbreak in {daysToOutbreak} Day{daysToOutbreak > 1 ? 's' : ''}
@@ -176,7 +176,7 @@ export default function Forecast() {
                       {new Date(day.date).toLocaleDateString('en-IN', { weekday: 'short' })}
                     </div>
                     <div style={{ fontSize: '1.8rem', marginBottom: 8 }}>
-                      {WEATHER_ICONS[day.weather_condition] || '🌤'}
+                      {WEATHER_ICONS[day.weather_condition] || 'Fair'}
                     </div>
                     <div style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f1f5f9', marginBottom: 4 }}>
                       {day.temperature}°
@@ -217,7 +217,7 @@ export default function Forecast() {
             <div className="ds-card">
               <div className="ds-lbl">Trend Direction</div>
               <div className="ds-val" style={{ color: isRising ? '#fca5a5' : '#6ee7b7' }}>
-                {isRising ? '↑ Rising' : '→ Stable'}
+                {isRising ? 'Rising' : 'Stable'}
               </div>
               <div className="ds-unit">7-day outlook</div>
             </div>

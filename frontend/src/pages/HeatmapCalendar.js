@@ -197,21 +197,21 @@ export default function HeatmapCalendar() {
       {/* Summary Stats */}
       <div className="stats-row">
         <div className="stat-card">
-          <div className="stat-icon-wrap si-red">🔥</div>
+          <div className="stat-icon-wrap si-red"></div>
           <div>
             <div className="stat-num">{yearData.filter(d => d.score >= 70).length}</div>
             <div className="stat-lbl">High Risk Days</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-amber">⚠</div>
+          <div className="stat-icon-wrap si-amber"></div>
           <div>
             <div className="stat-num">{yearData.filter(d => d.score >= 40 && d.score < 70).length}</div>
             <div className="stat-lbl">Medium Risk Days</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-green">✓</div>
+          <div className="stat-icon-wrap si-green"></div>
           <div>
             <div className="stat-num">{yearData.filter(d => d.score < 40).length}</div>
             <div className="stat-lbl">Low Risk Days</div>

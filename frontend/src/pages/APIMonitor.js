@@ -52,28 +52,28 @@ export default function APIMonitor() {
       {/* Stats */}
       <div className="stats-row">
         <div className="stat-card">
-          <div className="stat-icon-wrap si-blue">📊</div>
+          <div className="stat-icon-wrap si-blue"></div>
           <div>
             <div className="stat-num">{totalRequests.toLocaleString()}</div>
             <div className="stat-lbl">Requests Today</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-amber">⚡</div>
+          <div className="stat-icon-wrap si-amber"></div>
           <div>
             <div className="stat-num">{avgLatency}ms</div>
             <div className="stat-lbl">Avg Latency</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-green">✓</div>
+          <div className="stat-icon-wrap si-green"></div>
           <div>
             <div className="stat-num">{uptime}%</div>
             <div className="stat-lbl">Uptime</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-red">✗</div>
+          <div className="stat-icon-wrap si-red"></div>
           <div>
             <div className="stat-num">{errorRate}%</div>
             <div className="stat-lbl">Error Rate</div>

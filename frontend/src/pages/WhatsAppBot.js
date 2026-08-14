@@ -105,7 +105,7 @@ export default function WhatsAppBot() {
           background: '#128c7e', display: 'flex', alignItems: 'center',
           justifyContent: 'center', fontSize: '1.2rem',
         }}>
-          🤖
+          Bot
         </div>
         <div>
           <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>EarlyAlert Bot</div>
@@ -149,7 +149,7 @@ export default function WhatsAppBot() {
               )}
               <div style={{ fontSize: '0.62rem', color: '#999', textAlign: 'right', marginTop: 4 }}>
                 {msg.time}
-                {msg.sender === 'user' && ' ✓✓'}
+                {msg.sender === 'user' && ' Read'}
               </div>
             </div>
           </div>
@@ -192,7 +192,7 @@ export default function WhatsAppBot() {
             display: 'flex', alignItems: 'center', justifyContent: 'center',
           }}
         >
-          ➤
+          Send
         </button>
       </div>
 

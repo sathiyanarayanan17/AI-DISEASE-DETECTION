@@ -136,10 +136,10 @@ export default function EmailScheduler() {
           </div>
 
           <button className="btn-detail" onClick={addSchedule}>
-            📧 Schedule Report
+            Schedule Report
           </button>
           <button className="btn-detail" style={{ marginLeft: 10 }} onClick={() => setShowPreview(!showPreview)}>
-            👁 {showPreview ? 'Hide' : 'Show'} Preview
+            {showPreview ? 'Hide' : 'Show'} Preview
           </button>
         </div>
       </div>
@@ -199,7 +199,7 @@ export default function EmailScheduler() {
         <div className="card-body">
           {schedules.length === 0 ? (
             <div className="empty">
-              <div className="empty-icon">📭</div>
+              <div className="empty-icon">--</div>
               <h3>No Scheduled Reports</h3>
               <p>Create a schedule above to receive automated risk reports.</p>
             </div>

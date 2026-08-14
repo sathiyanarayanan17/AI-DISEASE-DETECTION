@@ -25,7 +25,7 @@ function AlertCard({ a }) {
       </div>
       <div className="ac-rec">{a.recommendation || 'No recommendation available.'}</div>
       <button className="btn-detail" onClick={() => nav(`/district/${encodeURIComponent(a.district)}`)}>
-        View Details →
+        View Details &gt;
       </button>
     </div>
   );
@@ -61,9 +61,9 @@ export default function Alerts({ alerts = [], loading }) {
   return (
     <>
       <div style={{ display: 'flex', gap: 10, marginBottom: 20, flexWrap: 'wrap' }}>
-        <span className="pill pill-red">🔴 High: {counts.High}</span>
-        <span className="pill pill-amber">⚠ Medium: {counts.Medium}</span>
-        <span className="pill pill-green">✓ Low: {counts.Low}</span>
+        <span className="pill pill-red">High: {counts.High}</span>
+        <span className="pill pill-amber">Medium: {counts.Medium}</span>
+        <span className="pill pill-green">Low: {counts.Low}</span>
       </div>
 
       <div className="filter-bar">
@@ -80,7 +80,7 @@ export default function Alerts({ alerts = [], loading }) {
 
       {filtered.length === 0 ? (
         <div className="empty">
-          <div className="empty-icon">✅</div>
+          <div className="empty-icon">--</div>
           <h3>No {filter !== 'All' ? filter + ' Risk' : ''} Alerts</h3>
           <p>All monitored districts are within normal parameters.</p>
         </div>

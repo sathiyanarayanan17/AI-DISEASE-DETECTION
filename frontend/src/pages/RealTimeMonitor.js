@@ -47,9 +47,9 @@ function FeedItem({ item, isNew }) {
         </span>
       </div>
       <div style={{ display: 'flex', gap: 20, fontSize: '0.78rem', color: '#94a3b8' }}>
-        <span>🌧 {item.rainfall_mm?.toFixed(1) ?? '--'} mm</span>
-        <span>🌡 {item.temperature_c?.toFixed(1) ?? '--'}°C</span>
-        <span>💧 {item.humidity_pct?.toFixed(0) ?? '--'}%</span>
+        <span>Rain: {item.rainfall_mm?.toFixed(1) ?? '--'} mm</span>
+        <span>Temp: {item.temperature_c?.toFixed(1) ?? '--'}°C</span>
+        <span>Hum: {item.humidity_pct?.toFixed(0) ?? '--'}%</span>
         {item.risk_score != null && <span>Score: <strong style={{ color: '#f1f5f9' }}>{item.risk_score}</strong></span>}
       </div>
     </div>
@@ -129,7 +129,7 @@ export default function RealTimeMonitor() {
           alignItems: 'center',
           gap: 10,
         }}>
-          <span style={{ fontSize: '1.2rem' }}>🚨</span>
+          <span style={{ fontSize: '1.2rem', color: '#ef4444', fontWeight: 700 }}>!</span>
           <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#fca5a5' }}>
             {newAlerts} new high-risk alert{newAlerts > 1 ? 's' : ''} detected!
           </span>
@@ -148,21 +148,21 @@ export default function RealTimeMonitor() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16, marginBottom: 24 }}>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-blue">📡</div>
+          <div className="stat-icon-wrap si-blue"></div>
           <div>
             <div className="stat-num">{districts.length}</div>
             <div className="stat-lbl">Stations Active</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-green">🔄</div>
+          <div className="stat-icon-wrap si-green"></div>
           <div>
             <div className="stat-num">{feed.length}</div>
             <div className="stat-lbl">Data Points</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-red">🚨</div>
+          <div className="stat-icon-wrap si-red"></div>
           <div>
             <div className="stat-num" style={{ color: '#fca5a5' }}>{highRiskFeed.length}</div>
             <div className="stat-lbl">High Risk Events</div>
@@ -211,7 +211,7 @@ export default function RealTimeMonitor() {
         <div className="card-body" style={{ maxHeight: 500, overflowY: 'auto' }}>
           {feed.length === 0 ? (
             <div className="empty">
-              <div className="empty-icon">📡</div>
+              <div className="empty-icon">--</div>
               <h3>Waiting for data...</h3>
               <p>Real-time weather data will appear here once the backend is connected.</p>
             </div>

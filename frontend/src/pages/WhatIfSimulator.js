@@ -147,7 +147,7 @@ export default function WhatIfSimulator() {
       {/* Before / After Comparison */}
       <div className="stats-row" style={{ marginBottom: 24 }}>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-blue">📊</div>
+          <div className="stat-icon-wrap si-blue"></div>
           <div>
             <div className="stat-lbl">Baseline (Current)</div>
             <div className="stat-num" style={{ color: baseline ? riskColor(baseline.risk_level) : '#94a3b8' }}>
@@ -157,7 +157,7 @@ export default function WhatIfSimulator() {
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-amber">🔮</div>
+          <div className="stat-icon-wrap si-amber"></div>
           <div>
             <div className="stat-lbl">Predicted (Simulated)</div>
             <div className="stat-num" style={{ color: prediction ? riskColor(prediction.risk_level) : '#94a3b8' }}>
@@ -167,7 +167,7 @@ export default function WhatIfSimulator() {
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-green">📈</div>
+          <div className="stat-icon-wrap si-green"></div>
           <div>
             <div className="stat-lbl">Change</div>
             <div className="stat-num" style={{ color: '#6366f1' }}>

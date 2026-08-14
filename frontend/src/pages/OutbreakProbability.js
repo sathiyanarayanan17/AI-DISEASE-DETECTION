@@ -63,7 +63,7 @@ export default function OutbreakProbability() {
           borderRadius: 12, padding: '14px 20px', marginBottom: 24,
           display: 'flex', alignItems: 'center', gap: 12,
         }}>
-          <span style={{ fontSize: '1.3rem' }}>🚨</span>
+          <span style={{ fontSize: '1.3rem', color: '#ef4444', fontWeight: 700 }}>ALERT</span>
           <div>
             <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#ef4444' }}>
               HIGH PROBABILITY: {peakProb.toFixed(0)}% chance of outbreak in {district} within {highProbDay ? highProbDay.dayNum : 5} days
@@ -186,21 +186,21 @@ export default function OutbreakProbability() {
       {/* Summary Stats */}
       <div className="stats-row">
         <div className="stat-card">
-          <div className="stat-icon-wrap si-red">📊</div>
+          <div className="stat-icon-wrap si-red"></div>
           <div>
             <div className="stat-num" style={{ color: peakProb > 70 ? '#ef4444' : '#f59e0b' }}>{peakProb.toFixed(0)}%</div>
             <div className="stat-lbl">Peak Probability</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-blue">📅</div>
+          <div className="stat-icon-wrap si-blue"></div>
           <div>
             <div className="stat-num">Day 1</div>
             <div className="stat-lbl">Highest Risk Day</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-green">🎯</div>
+          <div className="stat-icon-wrap si-green"></div>
           <div>
             <div className="stat-num">87%</div>
             <div className="stat-lbl">Model Confidence</div>

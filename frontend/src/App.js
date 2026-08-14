@@ -41,7 +41,7 @@ function Sidebar({ highCount }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
-        <div className="logo-icon">🛡</div>
+        <div className="logo-icon">EA</div>
         <div className="logo-text">
           <div className="logo-name">EarlyAlert</div>
           <div className="logo-sub">Tamil Nadu AI</div>
@@ -51,125 +51,125 @@ function Sidebar({ highCount }) {
       <div className="sidebar-section">
         <div className="sidebar-section-label">Main</div>
         <NavLink to="/" end className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">📊</span><span className="nav-label">Dashboard</span>
+          <span className="nav-label">Dashboard</span>
         </NavLink>
         <NavLink to="/alerts" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">🚨</span><span className="nav-label">Alerts</span>
+          <span className="nav-label">Alerts</span>
           {highCount > 0 && <span className="nav-badge-count">{highCount}</span>}
         </NavLink>
         <NavLink to="/forecast" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">🔮</span><span className="nav-label">Forecast</span>
+          <span className="nav-label">Forecast</span>
         </NavLink>
         <NavLink to="/realtime" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">📡</span><span className="nav-label">Real-Time</span>
+          <span className="nav-label">Real-Time</span>
         </NavLink>
       </div>
 
       <div className="sidebar-section">
         <div className="sidebar-section-label">Disease Tracker</div>
         <NavLink to="/disease/dengue" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">🦟</span><span className="nav-label">Dengue</span>
+          <span className="nav-label">Dengue</span>
         </NavLink>
         <NavLink to="/disease/cholera" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">💧</span><span className="nav-label">Cholera</span>
+          <span className="nav-label">Cholera</span>
         </NavLink>
         <NavLink to="/disease/malaria" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">🩸</span><span className="nav-label">Malaria</span>
+          <span className="nav-label">Malaria</span>
         </NavLink>
       </div>
 
       <div className="sidebar-section">
         <div className="sidebar-section-label">AI Tools</div>
         <NavLink to="/what-if" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">🎛</span><span className="nav-label">What-If Simulator</span>
+          <span className="nav-label">What-If Simulator</span>
         </NavLink>
         <NavLink to="/outbreak-probability" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">📈</span><span className="nav-label">Outbreak Probability</span>
+          <span className="nav-label">Outbreak Probability</span>
         </NavLink>
         <NavLink to="/anomalies" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">⚡</span><span className="nav-label">Anomaly Detection</span>
+          <span className="nav-label">Anomaly Detection</span>
         </NavLink>
         <NavLink to="/analytics" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">🧠</span><span className="nav-label">Model Analytics</span>
+          <span className="nav-label">Model Analytics</span>
         </NavLink>
       </div>
 
       <div className="sidebar-section">
         <div className="sidebar-section-label">Visualization</div>
         <NavLink to="/heatmap" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">🗓</span><span className="nav-label">Heatmap Calendar</span>
+          <span className="nav-label">Heatmap Calendar</span>
         </NavLink>
         <NavLink to="/timeline" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">▶</span><span className="nav-label">Timeline Playback</span>
+          <span className="nav-label">Timeline Playback</span>
         </NavLink>
         <NavLink to="/correlation" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">🔗</span><span className="nav-label">Correlations</span>
+          <span className="nav-label">Correlations</span>
         </NavLink>
         <NavLink to="/ranking" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">🏆</span><span className="nav-label">District Ranking</span>
+          <span className="nav-label">District Ranking</span>
         </NavLink>
       </div>
 
       <div className="sidebar-section">
         <div className="sidebar-section-label">Communication</div>
         <NavLink to="/voice-alerts" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">🔊</span><span className="nav-label">Voice Alerts</span>
+          <span className="nav-label">Voice Alerts</span>
         </NavLink>
         <NavLink to="/sms-alerts" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">📱</span><span className="nav-label">SMS Alerts</span>
+          <span className="nav-label">SMS Alerts</span>
         </NavLink>
         <NavLink to="/whatsapp" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">💬</span><span className="nav-label">WhatsApp Bot</span>
+          <span className="nav-label">WhatsApp Bot</span>
         </NavLink>
         <NavLink to="/email-scheduler" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">📧</span><span className="nav-label">Email Reports</span>
+          <span className="nav-label">Email Reports</span>
         </NavLink>
       </div>
 
       <div className="sidebar-section">
         <div className="sidebar-section-label">Tools</div>
         <NavLink to="/compare" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">⚖</span><span className="nav-label">Compare</span>
+          <span className="nav-label">Compare</span>
         </NavLink>
         <NavLink to="/reports" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">📄</span><span className="nav-label">Reports</span>
+          <span className="nav-label">Reports</span>
         </NavLink>
         <NavLink to="/resources" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">🏥</span><span className="nav-label">Resources</span>
+          <span className="nav-label">Resources</span>
         </NavLink>
         <NavLink to="/hospitals" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">🏨</span><span className="nav-label">Nearby Hospitals</span>
+          <span className="nav-label">Nearby Hospitals</span>
         </NavLink>
         <NavLink to="/citizen-report" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">🙋</span><span className="nav-label">Citizen Report</span>
+          <span className="nav-label">Citizen Report</span>
         </NavLink>
         <NavLink to="/budget" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">💰</span><span className="nav-label">Budget Estimator</span>
+          <span className="nav-label">Budget Estimator</span>
         </NavLink>
       </div>
 
       <div className="sidebar-section">
         <div className="sidebar-section-label">System</div>
         <NavLink to="/prevention" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">💊</span><span className="nav-label">Prevention Tips</span>
+          <span className="nav-label">Prevention Tips</span>
         </NavLink>
         <NavLink to="/public" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">👥</span><span className="nav-label">Public View</span>
+          <span className="nav-label">Public View</span>
         </NavLink>
         <NavLink to="/model-versions" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">🔄</span><span className="nav-label">Model Versions</span>
+          <span className="nav-label">Model Versions</span>
         </NavLink>
         <NavLink to="/api-monitor" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">⚙</span><span className="nav-label">API Monitor</span>
+          <span className="nav-label">API Monitor</span>
         </NavLink>
         <NavLink to="/audit" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">📋</span><span className="nav-label">Audit Trail</span>
+          <span className="nav-label">Audit Trail</span>
         </NavLink>
         <NavLink to="/deploy" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">🐳</span><span className="nav-label">Deployment</span>
+          <span className="nav-label">Deployment</span>
         </NavLink>
         <NavLink to="/settings" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-          <span className="nav-icon">⚙</span><span className="nav-label">Settings</span>
+          <span className="nav-label">Settings</span>
         </NavLink>
       </div>
 

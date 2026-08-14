@@ -114,7 +114,7 @@ export default function PublicDashboard() {
         <div className="card">
           <div className="card-body" style={{ padding: 20, textAlign: 'center' }}>
             <div style={{ fontSize: '1.5rem', marginBottom: 8 }}>
-              {snap.risk_level === 'High' ? '🚨' : snap.risk_level === 'Medium' ? '⚠' : '✅'}
+              {snap.risk_level === 'High' ? '!' : snap.risk_level === 'Medium' ? '~' : 'OK'}
             </div>
             <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1e293b', marginBottom: 4 }}>
               Current Risk
@@ -131,7 +131,7 @@ export default function PublicDashboard() {
         {/* Weather Card */}
         <div className="card">
           <div className="card-body" style={{ padding: 20, textAlign: 'center' }}>
-            <div style={{ fontSize: '1.5rem', marginBottom: 8 }}>🌤</div>
+            <div style={{ fontSize: '1.5rem', marginBottom: 8 }}>--</div>
             <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1e293b', marginBottom: 4 }}>
               Weather
             </div>
@@ -147,7 +147,7 @@ export default function PublicDashboard() {
         {/* Prevention Tips Card */}
         <div className="card">
           <div className="card-body" style={{ padding: 20, textAlign: 'center' }}>
-            <div style={{ fontSize: '1.5rem', marginBottom: 8 }}>🛡</div>
+            <div style={{ fontSize: '1.5rem', marginBottom: 8 }}>--</div>
             <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#1e293b', marginBottom: 4 }}>
               Prevention
             </div>
@@ -165,7 +165,7 @@ export default function PublicDashboard() {
             margin: '0 0 12px', fontSize: '1.2rem', fontWeight: 800, color: '#1e293b',
             display: 'flex', alignItems: 'center', gap: 10,
           }}>
-            <span>🤔</span> What should I do?
+            <span></span> What should I do?
           </h3>
           <div style={{
             background: advice.urgency === 'urgent' ? 'rgba(239,68,68,0.05)' : advice.urgency === 'moderate' ? 'rgba(245,158,11,0.05)' : 'rgba(16,185,129,0.05)',
@@ -189,7 +189,7 @@ export default function PublicDashboard() {
       <div className="card">
         <div className="card-body" style={{ padding: 28 }}>
           <h3 style={{ margin: '0 0 16px', fontSize: '1.1rem', fontWeight: 800, color: '#1e293b' }}>
-            📞 Emergency Contacts
+            Emergency Contacts
           </h3>
           <div style={{ display: 'grid', gap: 12 }}>
             {[

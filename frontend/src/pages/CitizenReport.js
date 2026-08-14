@@ -3,12 +3,12 @@ import { DISTRICT_COORDS } from '../services/api';
 import { submitCitizenReport } from '../services/api';
 
 const SYMPTOM_OPTIONS = [
-  { id: 'fever', label: 'Fever', icon: '🌡' },
-  { id: 'vomiting', label: 'Vomiting', icon: '🤮' },
-  { id: 'rash', label: 'Skin Rash', icon: '🔴' },
-  { id: 'body_pain', label: 'Body Pain', icon: '💪' },
-  { id: 'diarrhea', label: 'Diarrhea', icon: '💧' },
-  { id: 'headache', label: 'Headache', icon: '🤕' },
+  { id: 'fever', label: 'Fever', icon: '' },
+  { id: 'vomiting', label: 'Vomiting', icon: '' },
+  { id: 'rash', label: 'Skin Rash', icon: '' },
+  { id: 'body_pain', label: 'Body Pain', icon: '' },
+  { id: 'diarrhea', label: 'Diarrhea', icon: '' },
+  { id: 'headache', label: 'Headache', icon: '' },
 ];
 
 const MOCK_RECENT_REPORTS = [
@@ -104,7 +104,7 @@ export default function CitizenReport() {
       {submitted ? (
         <div className="card" style={{ marginBottom: 24 }}>
           <div className="card-body" style={{ textAlign: 'center', padding: '48px 24px' }}>
-            <div style={{ fontSize: '3.5rem', marginBottom: 16 }}>✅</div>
+            <div style={{ fontSize: '3.5rem', marginBottom: 16 }}>OK</div>
             <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#6ee7b7', margin: '0 0 8px' }}>
               Report Submitted Successfully!
             </h3>
@@ -208,7 +208,7 @@ export default function CitizenReport() {
                         {s.label}
                       </span>
                       {formData.symptoms.includes(s.id) && (
-                        <span style={{ marginLeft: 'auto', color: '#3b82f6', fontWeight: 700 }}>✓</span>
+                        <span style={{ marginLeft: 'auto', color: '#3b82f6', fontWeight: 700 }}>OK</span>
                       )}
                     </div>
                   ))}
@@ -225,7 +225,7 @@ export default function CitizenReport() {
                   opacity: (!formData.name || formData.symptoms.length === 0) ? 0.5 : 1,
                 }}
               >
-                {submitting ? 'Submitting...' : '📤 Submit Report'}
+                {submitting ? 'Submitting...' : 'Submit Report'}
               </button>
             </form>
           </div>

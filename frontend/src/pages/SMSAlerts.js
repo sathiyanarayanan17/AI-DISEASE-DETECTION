@@ -69,21 +69,21 @@ export default function SMSAlerts() {
       {/* Stats Row */}
       <div className="stats-row" style={{ marginBottom: 24 }}>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-blue">📱</div>
+          <div className="stat-icon-wrap si-blue"></div>
           <div>
             <div className="stat-num">{alerts.length}</div>
             <div className="stat-lbl">Total Sent Today</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-green">✓</div>
+          <div className="stat-icon-wrap si-green"></div>
           <div>
             <div className="stat-num" style={{ color: '#10b981' }}>{deliveryRate}%</div>
             <div className="stat-lbl">Delivery Rate</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-amber">⏱</div>
+          <div className="stat-icon-wrap si-amber"></div>
           <div>
             <div className="stat-num">2.3s</div>
             <div className="stat-lbl">Avg Response Time</div>

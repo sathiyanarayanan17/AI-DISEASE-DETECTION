@@ -8,7 +8,7 @@ import ExportButton from '../components/ExportButton';
 
 const DISEASE_INFO = {
   dengue: {
-    icon: '🦟',
+    icon: '',
     color: '#f59e0b',
     name: 'Dengue Fever',
     symptoms: ['High fever (40C/104F)', 'Severe headache', 'Pain behind eyes', 'Muscle and joint pain', 'Nausea/vomiting', 'Skin rash', 'Fatigue'],
@@ -18,7 +18,7 @@ const DISEASE_INFO = {
     risk_factors: ['Stagnant water near homes', 'Tropical/subtropical climate', 'Urbanization with poor drainage', 'Previous dengue infection', 'Monsoon season (Oct-Dec in TN)'],
   },
   cholera: {
-    icon: '💧',
+    icon: '',
     color: '#3b82f6',
     name: 'Cholera',
     symptoms: ['Profuse watery diarrhea', 'Vomiting', 'Rapid dehydration', 'Leg cramps', 'Restlessness', 'Low blood pressure', 'Rapid heart rate'],
@@ -28,7 +28,7 @@ const DISEASE_INFO = {
     risk_factors: ['Contaminated water supply', 'Poor sanitation infrastructure', 'Flooding events', 'Overcrowded areas', 'Post-disaster conditions'],
   },
   malaria: {
-    icon: '🩸',
+    icon: '',
     color: '#10b981',
     name: 'Malaria',
     symptoms: ['Cyclic fever with chills', 'Sweating', 'Headache', 'Nausea/vomiting', 'Body aches', 'Anemia', 'Jaundice (severe cases)'],
@@ -99,23 +99,23 @@ export default function DiseaseTracker({ disease }) {
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-amber">📈</div>
+          <div className="stat-icon-wrap si-amber"></div>
           <div>
             <div className="stat-num" style={{ color: data?.trend === 'rising' ? '#fca5a5' : '#6ee7b7' }}>
-              {data?.trend === 'rising' ? '↑' : '↓'}
+              {data?.trend === 'rising' ? 'Up' : 'Down'}
             </div>
             <div className="stat-lbl">Current Trend</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-blue">📅</div>
+          <div className="stat-icon-wrap si-blue"></div>
           <div>
             <div className="stat-num" style={{ fontSize: '1.4rem' }}>{data?.peak_month || 'Nov'}</div>
             <div className="stat-lbl">Peak Month</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-green">⏱</div>
+          <div className="stat-icon-wrap si-green"></div>
           <div>
             <div className="stat-num" style={{ fontSize: '1.2rem' }}>{info.incubation}</div>
             <div className="stat-lbl">Incubation Period</div>
@@ -176,7 +176,7 @@ export default function DiseaseTracker({ disease }) {
                       background: d.trend === 'rising' ? 'rgba(239,68,68,0.1)' : 'rgba(16,185,129,0.1)',
                       color: d.trend === 'rising' ? '#fca5a5' : '#6ee7b7',
                     }}>
-                      {d.trend === 'rising' ? '↑ Rising' : '↓ Declining'}
+                      {d.trend === 'rising' ? 'Rising' : 'Declining'}
                     </span>
                   </td>
                   <td style={{ fontSize: '0.78rem', color: '#64748b' }}>{d.last_updated}</td>
@@ -192,7 +192,7 @@ export default function DiseaseTracker({ disease }) {
         {/* Symptoms */}
         <div className="card">
           <div className="card-head">
-            <h3 className="card-head-title">🩺 Symptoms</h3>
+            <h3 className="card-head-title">Symptoms</h3>
           </div>
           <div className="card-body">
             {info.symptoms.map((s, i) => (
@@ -210,7 +210,7 @@ export default function DiseaseTracker({ disease }) {
         {/* Prevention */}
         <div className="card">
           <div className="card-head">
-            <h3 className="card-head-title">🛡 Prevention Tips</h3>
+            <h3 className="card-head-title">Prevention Tips</h3>
           </div>
           <div className="card-body">
             {info.prevention.map((p, i) => (
@@ -218,7 +218,7 @@ export default function DiseaseTracker({ disease }) {
                 display: 'flex', alignItems: 'center', gap: 10,
                 padding: '8px 0', borderBottom: i < info.prevention.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
               }}>
-                <span style={{ color: '#10b981', fontWeight: 700 }}>✓</span>
+                <span style={{ color: '#10b981', fontWeight: 700 }}>OK</span>
                 <span style={{ fontSize: '0.84rem', color: '#cbd5e1' }}>{p}</span>
               </div>
             ))}
@@ -229,7 +229,7 @@ export default function DiseaseTracker({ disease }) {
       {/* Risk Factors */}
       <div className="card">
         <div className="card-head">
-          <h3 className="card-head-title">⚠ Risk Factors</h3>
+          <h3 className="card-head-title">Risk Factors</h3>
           <span style={{ fontSize: '0.72rem', color: '#475569' }}>Vector: {info.vector}</span>
         </div>
         <div className="card-body" style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>

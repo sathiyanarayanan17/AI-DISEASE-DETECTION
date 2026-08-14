@@ -5,7 +5,7 @@ const CURRENT_MONTH = new Date().getMonth() + 1;
 const DISEASES = [
   {
     name: 'Dengue',
-    icon: '🦟',
+    icon: '',
     seasonalMonths: [6, 7, 8, 9, 10, 11],
     tips: [
       'Eliminate standing water in containers, flower pots, and tyres around your home',
@@ -19,7 +19,7 @@ const DISEASES = [
   },
   {
     name: 'Cholera',
-    icon: '💧',
+    icon: '',
     seasonalMonths: [4, 5, 6, 7, 8],
     tips: [
       'Always drink boiled or filtered water from clean sources',
@@ -33,7 +33,7 @@ const DISEASES = [
   },
   {
     name: 'Malaria',
-    icon: '🩸',
+    icon: '',
     seasonalMonths: [7, 8, 9, 10, 11, 12],
     tips: [
       'Sleep under insecticide-treated bed nets (ITNs) every night',
@@ -81,7 +81,7 @@ export default function PreventionTips() {
                 <div>
                   <div style={{ fontWeight: 700, fontSize: '0.85rem', color: 'var(--text1)' }}>{d.name}</div>
                   <div style={{ fontSize: '0.7rem', color: isHighRisk(d.seasonalMonths) ? '#dc2626' : '#059669', fontWeight: 600 }}>
-                    {isHighRisk(d.seasonalMonths) ? '⚠ HIGH RISK this month' : '✓ Low risk this month'}
+                    {isHighRisk(d.seasonalMonths) ? 'HIGH RISK this month' : 'Low risk this month'}
                   </div>
                 </div>
               </div>
@@ -98,16 +98,16 @@ export default function PreventionTips() {
               <span style={{ fontSize: '1.4rem' }}>{disease.icon}</span>
               <h3 className="card-head-title">{disease.name}</h3>
               {isHighRisk(disease.seasonalMonths) ? (
-                <span className="badge badge-high">⚠ High Risk</span>
+                <span className="badge badge-high">High Risk</span>
               ) : (
-                <span className="badge badge-low">✓ Low Risk</span>
+                <span className="badge badge-low">Low Risk</span>
               )}
             </div>
             <button
               className="btn-detail"
               onClick={() => handleShare(disease.name)}
             >
-              {copied === disease.name ? '✓ Copied!' : '📋 Share Tips'}
+              {copied === disease.name ? 'Copied!' : 'Share Tips'}
             </button>
           </div>
           <div className="card-body">
@@ -148,12 +148,12 @@ export default function PreventionTips() {
         <div className="card-body">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 14 }}>
             {[
-              { label: 'Health Helpline (TN)', number: '104', icon: '📞' },
-              { label: 'Ambulance', number: '108', icon: '🚑' },
-              { label: 'Disaster Management', number: '1070', icon: '🆘' },
-              { label: 'District Collector', number: '1800-425-1234', icon: '🏛' },
-              { label: 'ICMR Helpline', number: '011-2398-0000', icon: '🔬' },
-              { label: 'National Health Portal', number: '1800-180-1104', icon: '🏥' },
+              { label: 'Health Helpline (TN)', number: '104', icon: '' },
+              { label: 'Ambulance', number: '108', icon: '' },
+              { label: 'Disaster Management', number: '1070', icon: '' },
+              { label: 'District Collector', number: '1800-425-1234', icon: '' },
+              { label: 'ICMR Helpline', number: '011-2398-0000', icon: '' },
+              { label: 'National Health Portal', number: '1800-180-1104', icon: '' },
             ].map(c => (
               <div key={c.label} style={{ padding: 14, background: 'var(--bg-card2)', borderRadius: 10, border: '1px solid var(--border)', textAlign: 'center' }}>
                 <div style={{ fontSize: '1.3rem', marginBottom: 6 }}>{c.icon}</div>

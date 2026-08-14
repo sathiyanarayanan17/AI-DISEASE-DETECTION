@@ -158,7 +158,7 @@ export default function Reports() {
               className="btn-detail"
               style={{ padding: '10px 24px', fontSize: '0.85rem' }}
             >
-              {loading ? '...' : '📄 Generate Report'}
+              {loading ? '...' : 'Generate Report'}
             </button>
           </div>
         </div>
@@ -170,14 +170,14 @@ export default function Reports() {
           <div className="card" style={{ marginBottom: 24 }}>
             <div className="card-head">
               <h3 className="card-head-title">
-                📋 District Health Report - {report.district}
+                District Health Report - {report.district}
               </h3>
               <div style={{ display: 'flex', gap: 10 }}>
                 <span style={{ fontSize: '0.72rem', color: '#475569' }}>
                   Generated: {report.generated}
                 </span>
                 <button onClick={handlePrint} className="btn-detail" style={{ padding: '4px 12px', fontSize: '0.72rem' }}>
-                  🖨 Download PDF
+                  Download PDF
                 </button>
               </div>
             </div>
@@ -264,7 +264,7 @@ export default function Reports() {
 
       {!report && !loading && (
         <div className="empty">
-          <div className="empty-icon">📄</div>
+          <div className="empty-icon">--</div>
           <h3>No Report Generated</h3>
           <p>Select a district and date range above, then click Generate Report to create a comprehensive health report.</p>
         </div>

@@ -75,28 +75,28 @@ export default function AuditTrail() {
       {/* Stats */}
       <div className="stats-row">
         <div className="stat-card">
-          <div className="stat-icon-wrap si-blue">📋</div>
+          <div className="stat-icon-wrap si-blue"></div>
           <div>
             <div className="stat-num">{AUDIT_DATA.length}</div>
             <div className="stat-lbl">Total Activities</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-red">⚠</div>
+          <div className="stat-icon-wrap si-red"></div>
           <div>
             <div className="stat-num">{AUDIT_DATA.filter(e => e.action === 'Alert generated').length}</div>
             <div className="stat-lbl">Alerts Generated</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-green">📥</div>
+          <div className="stat-icon-wrap si-green"></div>
           <div>
             <div className="stat-num">{AUDIT_DATA.filter(e => e.action === 'Report downloaded').length}</div>
             <div className="stat-lbl">Reports Downloaded</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-amber">📱</div>
+          <div className="stat-icon-wrap si-amber"></div>
           <div>
             <div className="stat-num">{AUDIT_DATA.filter(e => e.action === 'SMS sent').length}</div>
             <div className="stat-lbl">SMS Sent</div>
@@ -109,7 +109,7 @@ export default function AuditTrail() {
         <div className="card-head">
           <h3 className="card-head-title">Activity Log</h3>
           <button className="btn-detail" onClick={exportCSV}>
-            📥 Export CSV
+            Export CSV
           </button>
         </div>
         <div className="card-body">

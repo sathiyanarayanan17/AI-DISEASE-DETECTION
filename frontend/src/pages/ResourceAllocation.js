@@ -79,7 +79,7 @@ export default function ResourceAllocation() {
               className="btn-detail"
               style={{ padding: '10px 24px', fontSize: '0.85rem', alignSelf: 'flex-end' }}
             >
-              {loading ? '...' : '🤖 Optimize Allocation'}
+              {loading ? '...' : 'Optimize Allocation'}
             </button>
             <div style={{ marginLeft: 'auto', fontSize: '0.78rem', color: '#64748b' }}>
               High-risk districts: <strong style={{ color: '#fca5a5' }}>{highRiskDistricts.length}</strong>
@@ -141,7 +141,7 @@ export default function ResourceAllocation() {
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: '1rem',
                     }}>
-                      👷
+                      
                     </div>
                     <div>
                       <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#f1f5f9' }}>{a.district}</div>

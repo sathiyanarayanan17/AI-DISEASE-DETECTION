@@ -72,9 +72,9 @@ export default function Analytics() {
       </div>
 
       <div className="detail-stats" style={{ marginBottom: 24 }}>
-        <MetricCard label="Accuracy" value={acc} unit="%" color="#3b82f6" icon="🎯" />
-        <MetricCard label="F1 Score (Macro)" value={f1} unit="%" color="#10b981" icon="📊" />
-        <MetricCard label="ROC-AUC" value={auc} unit="%" color="#8b5cf6" icon="📈" />
+        <MetricCard label="Accuracy" value={acc} unit="%" color="#3b82f6" icon="" />
+        <MetricCard label="F1 Score (Macro)" value={f1} unit="%" color="#10b981" icon="" />
+        <MetricCard label="ROC-AUC" value={auc} unit="%" color="#8b5cf6" icon="" />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 20, marginBottom: 24 }}>

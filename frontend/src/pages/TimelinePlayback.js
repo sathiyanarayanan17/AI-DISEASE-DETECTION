@@ -70,7 +70,7 @@ export default function TimelinePlayback() {
           <h3 className="card-head-title">Disease Risk Timeline Playback</h3>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--accent)' }}>
-              📅 {currentDate}
+              {currentDate}
             </span>
           </div>
         </div>
@@ -125,7 +125,7 @@ export default function TimelinePlayback() {
               onClick={togglePlay}
               style={{ minWidth: 80 }}
             >
-              {playing ? '⏸ Pause' : '▶ Play'}
+              {playing ? 'Pause' : 'Play'}
             </button>
 
             {/* Speed Control */}

@@ -94,21 +94,21 @@ export default function AnomalyDetection() {
       {/* Stats */}
       <div className="stats-row" style={{ marginBottom: 24 }}>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-red">🚨</div>
+          <div className="stat-icon-wrap si-red"></div>
           <div>
             <div className="stat-num">{totalAnomalies}</div>
             <div className="stat-lbl">Anomalies Detected</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-amber">🗺</div>
+          <div className="stat-icon-wrap si-amber"></div>
           <div>
             <div className="stat-num">{districtsAffected}</div>
             <div className="stat-lbl">Districts Affected</div>
           </div>
         </div>
         <div className="stat-card">
-          <div className="stat-icon-wrap si-blue">📅</div>
+          <div className="stat-icon-wrap si-blue"></div>
           <div>
             <div className="stat-num" style={{ fontSize: '1rem' }}>{lastAnomalyDate}</div>
             <div className="stat-lbl">Last Anomaly Date</div>

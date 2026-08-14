@@ -1,9 +1,9 @@
 import React from 'react';
 
 const ICONS = {
-  High:   '⚠',
-  Medium: '◈',
-  Low:    '✓',
+  High:   '!',
+  Medium: '~',
+  Low:    'OK',
 };
 
 export default function RiskBadge({ level, size = 'default' }) {

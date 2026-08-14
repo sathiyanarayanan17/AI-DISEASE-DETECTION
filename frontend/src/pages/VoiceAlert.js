@@ -193,7 +193,7 @@ export default function VoiceAlert() {
                   background: '#f8fafc', borderRadius: 8, padding: '10px 14px',
                   border: '1px solid rgba(0,0,0,0.04)',
                 }}>
-                  <span style={{ fontSize: '0.9rem' }}>🔊</span>
+                  <span style={{ fontSize: '0.9rem' }}></span>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '0.78rem', color: '#1e293b', fontWeight: 500 }}>
                       {h.district}

@@ -21,7 +21,7 @@ export default function LanguageToggle({ language, onToggle }) {
       }}
       title="Toggle Language"
     >
-      🌐 {language === 'en' ? 'EN' : 'TA'}
+      {language === 'en' ? 'EN' : 'TA'}
     </button>
   );
 }

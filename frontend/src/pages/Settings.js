@@ -77,7 +77,7 @@ export default function Settings() {
       {/* Appearance */}
       <div className="card" style={{ marginBottom: 20 }}>
         <div className="card-head">
-          <h3 className="card-head-title">🎨 Appearance</h3>
+          <h3 className="card-head-title">Appearance</h3>
         </div>
         <div className="card-body">
           <div style={rowStyle}>
@@ -86,7 +86,7 @@ export default function Settings() {
               <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: 2 }}>Switch between dark and light mode</div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>{theme === 'dark' ? '🌙 Dark' : '☀ Light'}</span>
+              <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>{theme === 'dark' ? 'Dark' : 'Light'}</span>
               <div style={toggleStyle(theme === 'dark')} onClick={toggleTheme}>
                 <div style={toggleDotStyle(theme === 'dark')} />
               </div>
@@ -98,7 +98,7 @@ export default function Settings() {
       {/* Language */}
       <div className="card" style={{ marginBottom: 20 }}>
         <div className="card-head">
-          <h3 className="card-head-title">🌐 Language</h3>
+          <h3 className="card-head-title">Language</h3>
         </div>
         <div className="card-body">
           <div style={rowStyle}>
@@ -135,7 +135,7 @@ export default function Settings() {
       {/* Notifications */}
       <div className="card" style={{ marginBottom: 20 }}>
         <div className="card-head">
-          <h3 className="card-head-title">🔔 Notifications</h3>
+          <h3 className="card-head-title">Notifications</h3>
         </div>
         <div className="card-body">
           {[
@@ -163,7 +163,7 @@ export default function Settings() {
       {/* API Status */}
       <div className="card" style={{ marginBottom: 20 }}>
         <div className="card-head">
-          <h3 className="card-head-title">🔌 API Connection</h3>
+          <h3 className="card-head-title">API Connection</h3>
         </div>
         <div className="card-body">
           <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -173,7 +173,7 @@ export default function Settings() {
               className="btn-detail"
               style={{ padding: '8px 20px' }}
             >
-              {checking ? 'Checking...' : '🔍 Check API Status'}
+              {checking ? 'Checking...' : 'Check API Status'}
             </button>
             {apiStatus && (
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -201,7 +201,7 @@ export default function Settings() {
       {/* About */}
       <div className="card">
         <div className="card-head">
-          <h3 className="card-head-title">ℹ About</h3>
+          <h3 className="card-head-title">About</h3>
         </div>
         <div className="card-body">
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>

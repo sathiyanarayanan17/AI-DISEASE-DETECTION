@@ -74,7 +74,7 @@ export default function DistrictDetail() {
   return (
     <>
       <div className="detail-head">
-        <button className="btn-back" onClick={() => nav(-1)}>← Back</button>
+        <button className="btn-back" onClick={() => nav(-1)}>Back</button>
         <h1 className="detail-name">{district}</h1>
         <div className="detail-sub">{snap.state || 'Tamil Nadu'}</div>
         <RiskBadge level={snap.risk_level} size="large" />
@@ -158,17 +158,17 @@ export default function DistrictDetail() {
 
       <div className="weather-row">
         <div className="w-card">
-          <div className="w-icon">🌧</div>
+          <div className="w-icon">Rain</div>
           <div className="w-val">{latest.rainfall != null ? latest.rainfall : '--'}</div>
           <div className="w-lbl">Rainfall (mm)</div>
         </div>
         <div className="w-card">
-          <div className="w-icon">🌡</div>
+          <div className="w-icon">Temp</div>
           <div className="w-val">{latest.temperature != null ? `${latest.temperature}°` : '--'}</div>
           <div className="w-lbl">Temperature (°C)</div>
         </div>
         <div className="w-card">
-          <div className="w-icon">💧</div>
+          <div className="w-icon">Hum</div>
           <div className="w-val">{latest.humidity != null ? `${latest.humidity}%` : '--'}</div>
           <div className="w-lbl">Humidity</div>
         </div>
@@ -176,7 +176,7 @@ export default function DistrictDetail() {
 
       {DISTRICT_COORDS[district] && (
         <div style={{ fontSize: '0.72rem', color: '#334155', textAlign: 'right', marginBottom: 24 }}>
-          📍 {DISTRICT_COORDS[district][0]}°N, {DISTRICT_COORDS[district][1]}°E
+          Location: {DISTRICT_COORDS[district][0]}°N, {DISTRICT_COORDS[district][1]}°E
         </div>
       )}
     </>

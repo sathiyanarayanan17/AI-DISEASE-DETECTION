@@ -25,28 +25,28 @@ function StatsRow({ districts }) {
   return (
     <div className="stats-row">
       <div className="stat-card">
-        <div className="stat-icon-wrap si-blue">🗺</div>
+        <div className="stat-icon-wrap si-blue"></div>
         <div>
           <div className="stat-num">{districts.length}</div>
           <div className="stat-lbl">Districts Monitored</div>
         </div>
       </div>
       <div className="stat-card">
-        <div className="stat-icon-wrap si-red">🔴</div>
+        <div className="stat-icon-wrap si-red"></div>
         <div>
           <div className="stat-num" style={{ color: '#fca5a5' }}>{high}</div>
           <div className="stat-lbl">High Risk</div>
         </div>
       </div>
       <div className="stat-card">
-        <div className="stat-icon-wrap si-amber">⚠</div>
+        <div className="stat-icon-wrap si-amber"></div>
         <div>
           <div className="stat-num" style={{ color: '#fcd34d' }}>{medium}</div>
           <div className="stat-lbl">Medium Risk</div>
         </div>
       </div>
       <div className="stat-card">
-        <div className="stat-icon-wrap si-green">🎯</div>
+        <div className="stat-icon-wrap si-green"></div>
         <div>
           <div className="stat-num" style={{ color: '#6ee7b7' }}>{avgConf}%</div>
           <div className="stat-lbl">Model Confidence</div>
@@ -160,7 +160,7 @@ function DistrictTable({ districts, onRowClick }) {
 
   const th = (key, label) => (
     <th onClick={() => toggle(key)} className={sortKey === key ? 'th-active' : ''}>
-      {label} {sortKey === key ? (sortDir === 'asc' ? ' ▲' : ' ▼') : ''}
+      {label} {sortKey === key ? (sortDir === 'asc' ? ' [A]' : ' [D]') : ''}
     </th>
   );
 
