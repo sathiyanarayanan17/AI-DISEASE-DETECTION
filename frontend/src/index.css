@@ -186,9 +186,10 @@ button, input, select, textarea {
 /* App Layout Grid */
 .app-container {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
   background-color: var(--bg-main);
   position: relative;
+  overflow: hidden;
 }
 
 .app-main-wrapper {
@@ -196,6 +197,8 @@ button, input, select, textarea {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  height: 100vh;
+  overflow-y: auto;
   transition: margin-left var(--transition-normal);
 }
 
@@ -206,6 +209,7 @@ button, input, select, textarea {
   width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
+  padding-bottom: 60px;
 }
 
 /* Card Styles */
