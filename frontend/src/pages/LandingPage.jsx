@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   ShieldAlert,
   Activity,
@@ -32,6 +32,7 @@ export const LandingPage = () => {
   const highRisk = getHighRiskDistricts();
   const topDistricts = DISTRICTS_DATA.slice(0, 6);
   const [darkMode, setDarkMode] = useState(true);
+  const navigate = useNavigate();
 
   const toggleTheme = () => {
     setDarkMode(!darkMode);
@@ -139,17 +140,17 @@ export const LandingPage = () => {
         </div>
 
         {/* Right side */}
-        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {/* Search - links to ranking page */}
-          <Link to="/ranking" style={{
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px', position: 'relative', zIndex: 100 }}>
+          {/* Search */}
+          <button onClick={() => navigate('/ranking')} style={{
             display: 'flex', alignItems: 'center', gap: '6px',
             background: 'var(--bg-input)', border: '1px solid var(--border-base)',
             borderRadius: 8, padding: '6px 12px', fontSize: '0.75rem', color: 'var(--text-muted)',
-            cursor: 'pointer', minWidth: 160, textDecoration: 'none'
+            cursor: 'pointer', minWidth: 160, fontFamily: 'inherit'
           }}>
             <Search size={14} />
             <span>Search districts...</span>
-          </Link>
+          </button>
 
           {/* Theme Toggle */}
           <button onClick={toggleTheme} style={{
@@ -160,12 +161,12 @@ export const LandingPage = () => {
             {darkMode ? <Sun size={16} /> : <Moon size={16} />}
           </button>
 
-          {/* Notifications - links to alerts */}
-          <Link to="/alerts" style={{
+          {/* Notifications */}
+          <button onClick={() => navigate('/alerts')} style={{
             background: 'var(--bg-input)', border: '1px solid var(--border-base)',
             borderRadius: 8, padding: '7px 10px', cursor: 'pointer',
             display: 'flex', alignItems: 'center', color: 'var(--text-secondary)',
-            position: 'relative', textDecoration: 'none'
+            position: 'relative'
           }}>
             <Bell size={16} />
             <span style={{
@@ -175,31 +176,32 @@ export const LandingPage = () => {
               fontSize: '0.55rem', fontWeight: 700,
               display: 'flex', alignItems: 'center', justifyContent: 'center'
             }}>{highRisk.length}</span>
-          </Link>
+          </button>
 
           {/* Login Button */}
-          <Link to="/login" style={{
+          <button onClick={() => navigate('/login')} style={{
             display: 'flex', alignItems: 'center', gap: '6px',
             background: 'var(--bg-input)', border: '1px solid var(--border-base)',
             borderRadius: 8, padding: '7px 14px',
             fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)',
-            textDecoration: 'none', transition: 'all 0.2s'
+            cursor: 'pointer', fontFamily: 'inherit'
           }}>
             <User size={14} />
             <span>Login</span>
-          </Link>
+          </button>
 
           {/* CTA */}
-          <Link to="/dashboard" style={{
+          <button onClick={() => navigate('/dashboard')} style={{
             display: 'flex', alignItems: 'center', gap: '6px',
             background: 'var(--accent-primary)', border: 'none',
             borderRadius: 8, padding: '8px 16px',
             fontSize: '0.78rem', fontWeight: 700, color: '#fff',
-            textDecoration: 'none', boxShadow: '0 4px 12px rgba(99,102,241,0.3)'
+            cursor: 'pointer', boxShadow: '0 4px 12px rgba(99,102,241,0.3)',
+            fontFamily: 'inherit'
           }}>
             <Activity size={14} />
             <span>Go to App</span>
-          </Link>
+          </button>
         </div>
       </nav>
 
