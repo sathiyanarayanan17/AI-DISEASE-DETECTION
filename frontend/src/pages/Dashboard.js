@@ -106,7 +106,7 @@ function RiskMap({ districts }) {
         <MapContainer center={[10.8, 78.5]} zoom={7} className="map-container" scrollWheelZoom>
           <TileLayer
             attribution='&copy; CARTO'
-            url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+            url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
           />
           {districts.map(d => d.lat && d.lng ? (
             <CircleMarker key={d.district} center={[d.lat, d.lng]}

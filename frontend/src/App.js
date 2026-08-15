@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import Alerts from './pages/Alerts';
 import DistrictDetail from './pages/DistrictDetail';
@@ -50,7 +51,7 @@ function Sidebar({ highCount }) {
 
       <div className="sidebar-section">
         <div className="sidebar-section-label">Main</div>
-        <NavLink to="/" end className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
+        <NavLink to="/dashboard" end className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
           <span className="nav-label">Dashboard</span>
         </NavLink>
         <NavLink to="/alerts" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
@@ -269,6 +270,15 @@ function AppContent() {
   }, []);
 
   const highCount = districts.filter(d => d.risk_level === 'High').length;
+  const isLanding = loc.pathname === '/';
+
+  if (isLanding) {
+    return (
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+      </Routes>
+    );
+  }
 
   return (
     <div className="app-shell">
@@ -282,7 +292,8 @@ function AppContent() {
         )}
         <div className="page-scroll">
           <Routes>
-            <Route path="/" element={<Dashboard districts={districts} loading={loading} />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/dashboard" element={<Dashboard districts={districts} loading={loading} />} />
             <Route path="/alerts" element={<Alerts alerts={alerts} loading={loading} />} />
             <Route path="/district/:name" element={<DistrictDetail />} />
             <Route path="/analytics" element={<Analytics />} />
