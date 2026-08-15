@@ -20,6 +20,8 @@ import {
 import { DISTRICTS_DATA, getHighRiskDistricts } from '../data/districtsData';
 import Sparkline from '../components/common/Sparkline';
 import RiskBadge from '../components/common/RiskBadge';
+import LiveTicker from '../components/layout/LiveTicker';
+import FloatingStatusWidget from '../components/common/FloatingStatusWidget';
 
 export const LandingPage = () => {
   const highRisk = getHighRiskDistricts();
@@ -83,7 +85,11 @@ export const LandingPage = () => {
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '64px', paddingBottom: '40px' }}>
+    <div className="app-container grid-bg" style={{ display: 'block', overflow: 'auto', height: '100vh' }}>
+      {/* Live District Ticker at top */}
+      <LiveTicker />
+
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px 32px' }}>
       {/* 1. HERO SECTION */}
       <section
         style={{
@@ -389,6 +395,7 @@ export const LandingPage = () => {
         style={{
           borderTop: '1px solid var(--border-base)',
           paddingTop: '28px',
+          marginTop: '64px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -407,6 +414,10 @@ export const LandingPage = () => {
           Official Public Health Portal for Tamil Nadu, India. All rights reserved.
         </div>
       </footer>
+      </div>
+
+      {/* Floating Status Widget */}
+      <FloatingStatusWidget />
     </div>
   );
 };

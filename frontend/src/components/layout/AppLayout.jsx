@@ -27,8 +27,6 @@ export const AppLayout = () => {
           onOpenSearch={() => setSearchModalOpen(true)}
         />
 
-        <LiveTicker />
-
         <main className="app-content-body">
           <Outlet />
         </main>
@@ -39,9 +37,6 @@ export const AppLayout = () => {
         isOpen={searchModalOpen}
         onClose={() => setSearchModalOpen(false)}
       />
-
-      {/* Floating Telemetry Widget */}
-      <FloatingStatusWidget />
 
       {/* Toast Notification Container */}
       <div
