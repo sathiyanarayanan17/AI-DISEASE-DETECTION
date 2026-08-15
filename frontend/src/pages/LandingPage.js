@@ -90,10 +90,10 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section - Two Column */}
-      <section style={{ position: 'relative', zIndex: 5, display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: 20, padding: '70px 32px 40px', maxWidth: '100%', margin: '0 auto', alignItems: 'center' }}>
+      <section style={{ position: 'relative', zIndex: 5, display: 'flex', padding: '70px 32px 40px', maxWidth: '100%', margin: '0 auto', alignItems: 'center', minHeight: '80vh' }}>
         
         {/* Left - Text */}
-        <div>
+        <div style={{ flex: '0 0 45%', paddingRight: 40 }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: 20, padding: '6px 14px', background: 'rgba(16,185,129,0.08)', border: '1px solid rgba(16,185,129,0.2)', borderRadius: 20 }}>
             <PulsingDot color="#10b981" />
             <span style={{ fontSize: '0.72rem', fontWeight: 600, color: '#34d399', letterSpacing: '0.06em' }}>Monitoring 37 Districts</span>
@@ -139,10 +139,10 @@ export default function LandingPage() {
         </div>
 
         {/* Right - Floating Dashboard Cards */}
-        <div style={{ position: 'relative', height: 520, marginRight: 20 }}>
+        <div style={{ flex: '1', position: 'relative', minHeight: 520 }}>
           
           {/* Card 1 - Risk Score */}
-          <FloatingCard style={{ position: 'absolute', top: 0, right: 20, width: 220 }} delay={0}>
+          <FloatingCard style={{ position: 'absolute', top: '0%', right: '5%', width: 220 }} delay={0}>
             <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Risk Score - Chennai</div>
             <div style={{ fontSize: '2rem', fontWeight: 800, color: '#fca5a5', marginBottom: 4 }}>78</div>
             <div style={{ fontSize: '0.7rem', color: '#ef4444', fontWeight: 600 }}>HIGH RISK</div>
@@ -152,7 +152,7 @@ export default function LandingPage() {
           </FloatingCard>
 
           {/* Card 2 - Cases Trend */}
-          <FloatingCard style={{ position: 'absolute', top: 60, left: 0, width: 200 }} delay={1}>
+          <FloatingCard style={{ position: 'absolute', top: '10%', left: '5%', width: 200 }} delay={1}>
             <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Daily Cases</div>
             <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#f1f5f9' }}>142</div>
             <div style={{ fontSize: '0.68rem', color: '#10b981', marginTop: 2 }}>-12% vs last week</div>
@@ -162,7 +162,7 @@ export default function LandingPage() {
           </FloatingCard>
 
           {/* Card 3 - Weather */}
-          <FloatingCard style={{ position: 'absolute', top: 220, right: 0, width: 180 }} delay={0.5}>
+          <FloatingCard style={{ position: 'absolute', top: '40%', right: '0%', width: 180 }} delay={0.5}>
             <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Rainfall (mm)</div>
             <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#60a5fa' }}>85.2</div>
             <div style={{ fontSize: '0.68rem', color: '#f59e0b', marginTop: 2 }}>Monsoon Active</div>
@@ -172,7 +172,7 @@ export default function LandingPage() {
           </FloatingCard>
 
           {/* Card 4 - Alert */}
-          <FloatingCard style={{ position: 'absolute', top: 280, left: 30, width: 210 }} delay={1.5}>
+          <FloatingCard style={{ position: 'absolute', top: '50%', left: '10%', width: 210 }} delay={1.5}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
               <PulsingDot color="#ef4444" />
               <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#fca5a5' }}>ALERT</span>
@@ -182,7 +182,7 @@ export default function LandingPage() {
           </FloatingCard>
 
           {/* Card 5 - Model */}
-          <FloatingCard style={{ position: 'absolute', bottom: 20, right: 40, width: 190 }} delay={2}>
+          <FloatingCard style={{ position: 'absolute', bottom: '5%', right: '10%', width: 190 }} delay={2}>
             <div style={{ fontSize: '0.65rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Model Performance</div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
               <span style={{ fontSize: '1.8rem', fontWeight: 800, color: '#a5b4fc' }}>97.2</span>
@@ -194,7 +194,7 @@ export default function LandingPage() {
           </FloatingCard>
 
           {/* Card 6 - Live Clock */}
-          <FloatingCard style={{ position: 'absolute', top: 140, left: 120, width: 160, textAlign: 'center' }} delay={0.8}>
+          <FloatingCard style={{ position: 'absolute', top: '25%', left: '35%', width: 160, textAlign: 'center' }} delay={0.8}>
             <div style={{ fontSize: '0.6rem', color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 4 }}>Live Time</div>
             <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#e2e8f0', fontVariantNumeric: 'tabular-nums' }}>
               {time.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
@@ -202,7 +202,7 @@ export default function LandingPage() {
           </FloatingCard>
 
           {/* Card 7 - Districts Active */}
-          <FloatingCard style={{ position: 'absolute', bottom: 60, left: -20, width: 170 }} delay={2.5}>
+          <FloatingCard style={{ position: 'absolute', bottom: '15%', left: '0%', width: 170 }} delay={2.5}>
             <div style={{ fontSize: '0.6rem', color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Districts Online</div>
             <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
               {Array.from({length: 37}).map((_, i) => (
