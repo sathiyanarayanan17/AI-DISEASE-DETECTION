@@ -152,13 +152,13 @@ export default function EmailScheduler() {
           </div>
           <div className="card-body" style={{ background: '#fafafa', fontFamily: 'monospace', fontSize: '0.78rem', lineHeight: 1.8 }}>
             <div style={{ borderBottom: '1px solid var(--border)', paddingBottom: 10, marginBottom: 10 }}>
-              <div><strong>From:</strong> noreply@earlyalert.tn.gov.in</div>
+              <div><strong>From:</strong> noreply@vyaadhishield.tn.gov.in</div>
               <div><strong>To:</strong> {email || 'recipient@email.com'}</div>
-              <div><strong>Subject:</strong> EarlyAlert {frequency} Risk Report - {new Date().toLocaleDateString('en-IN')}</div>
+              <div><strong>Subject:</strong> VyaadhiShield {frequency} Risk Report - {new Date().toLocaleDateString('en-IN')}</div>
             </div>
             <div style={{ padding: 10, background: '#fff', borderRadius: 8, border: '1px solid var(--border)' }}>
               <div style={{ textAlign: 'center', marginBottom: 12 }}>
-                <strong style={{ fontSize: '1rem', color: 'var(--accent)' }}>EarlyAlert Disease Risk Report</strong>
+                <strong style={{ fontSize: '1rem', color: 'var(--accent)' }}>VyaadhiShield Disease Risk Report</strong>
               </div>
               <p>Dear Health Officer,</p>
               <p>Here is your {frequency.toLowerCase()} disease risk summary for Tamil Nadu:</p>
@@ -184,7 +184,7 @@ export default function EmailScheduler() {
                 </tbody>
               </table>
               <p style={{ marginTop: 12, fontSize: '0.72rem', color: '#666' }}>
-                This is an automated report from the EarlyAlert Disease Outbreak Warning System.
+                This is an automated report from the VyaadhiShield Disease Outbreak Warning System.
               </p>
             </div>
           </div>

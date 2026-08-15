@@ -207,7 +207,7 @@ export default function Settings() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <tbody>
               {[
-                ['Application', 'EarlyAlert AI - Disease Outbreak Early Warning System'],
+                ['Application', 'VyaadhiShield AI - Disease Outbreak Early Warning System'],
                 ['Version', '2.0.0'],
                 ['Platform', 'Smart India Hackathon 2024'],
                 ['Region', 'Tamil Nadu, India (37 Districts)'],

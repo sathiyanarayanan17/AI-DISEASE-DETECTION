@@ -36,7 +36,7 @@ logging.basicConfig(
     format="%(asctime)s  %(levelname)-8s  %(name)s  %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
-logger = logging.getLogger("earlyalert.main")
+logger = logging.getLogger("vyaadhishield.main")
 
 # ---------------------------------------------------------------------------
 # Router imports (must come after sys.path is extended)
@@ -62,7 +62,7 @@ _model_loaded: bool = False
 # FastAPI application
 # ---------------------------------------------------------------------------
 app = FastAPI(
-    title="EarlyAlert AI",
+    title="VyaadhiShield AI",
     version="2.0.0",
     description=(
         "AI-powered Early Warning System for disease outbreak prediction "
@@ -233,7 +233,7 @@ async def startup_event() -> None:
 def root() -> dict:
     """Return basic metadata about the API and available endpoint groups."""
     return {
-        "name": "EarlyAlert AI",
+        "name": "VyaadhiShield AI",
         "version": "2.0.0",
         "description": (
             "AI-powered Early Warning System for disease outbreak prediction "

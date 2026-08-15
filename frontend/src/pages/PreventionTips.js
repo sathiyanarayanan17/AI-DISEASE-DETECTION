@@ -53,7 +53,7 @@ export default function PreventionTips() {
   const handleShare = (disease) => {
     const d = DISEASES.find(dd => dd.name === disease);
     if (!d) return;
-    const text = `${d.name} Prevention Tips:\n\n${d.tips.map((t, i) => `${i + 1}. ${t}`).join('\n')}\n\nDo's:\n${d.dos.map(x => `- ${x}`).join('\n')}\n\nDon'ts:\n${d.donts.map(x => `- ${x}`).join('\n')}\n\n- EarlyAlert Disease Warning System`;
+    const text = `${d.name} Prevention Tips:\n\n${d.tips.map((t, i) => `${i + 1}. ${t}`).join('\n')}\n\nDo's:\n${d.dos.map(x => `- ${x}`).join('\n')}\n\nDon'ts:\n${d.donts.map(x => `- ${x}`).join('\n')}\n\n- VyaadhiShield Disease Warning System`;
     navigator.clipboard.writeText(text).then(() => {
       setCopied(disease);
       setTimeout(() => setCopied(''), 2000);

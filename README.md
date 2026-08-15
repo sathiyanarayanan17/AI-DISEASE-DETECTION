@@ -1,4 +1,4 @@
-# 🛡 EarlyAlert — AI-Based Early Warning System for Disease Outbreaks
+# 🛡 VyaadhiShield — AI-Based Early Warning System for Disease Outbreaks
 
 > **District-level disease outbreak prediction using Machine Learning on Indian Government datasets (IDSP + IMD)**  
 > Built for **Smart India Hackathon (SIH)** — MedTech / HealthTech Theme
@@ -16,7 +16,7 @@ India faces recurring disease outbreaks (Dengue, Cholera, Malaria) that cause pr
 
 ## 💡 Our Solution
 
-EarlyAlert uses **machine learning on weather + epidemiological data** to predict disease outbreak risk at the district level, enabling **proactive public health response** instead of reactive damage control.
+VyaadhiShield uses **machine learning on weather + epidemiological data** to predict disease outbreak risk at the district level, enabling **proactive public health response** instead of reactive damage control.
 
 ### Key Innovation
 - **Time-series aware ML**: Trained on temporal patterns (monsoon, seasonal trends) without data leakage

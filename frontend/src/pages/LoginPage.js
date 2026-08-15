@@ -98,10 +98,10 @@ export default function LoginPage() {
               margin: '0 auto 14px', fontSize: '1.5rem',
               boxShadow: '0 4px 12px rgba(99,102,241,0.3)',
             }}>
-              EA
+              VS
             </div>
             <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--text1)', marginBottom: 4 }}>
-              EarlyAlert Login
+              VyaadhiShield Login
             </h2>
             <p style={{ fontSize: '0.8rem', color: 'var(--text3)' }}>
               Disease Outbreak Warning System

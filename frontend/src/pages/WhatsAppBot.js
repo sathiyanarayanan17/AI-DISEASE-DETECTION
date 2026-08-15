@@ -50,7 +50,7 @@ function parseQuery(text) {
 }
 
 const INITIAL_MESSAGES = [
-  { id: 1, sender: 'bot', text: 'Welcome to EarlyAlert Bot! I can help you check disease risk levels across Tamil Nadu districts.', time: '18:30' },
+  { id: 1, sender: 'bot', text: 'Welcome to VyaadhiShield Bot! I can help you check disease risk levels across Tamil Nadu districts.', time: '18:30' },
   { id: 2, sender: 'user', text: 'What is Chennai risk?', time: '18:31' },
   { id: 3, sender: 'bot', text: parseQuery('What is Chennai risk?').content, time: '18:31' },
   { id: 4, sender: 'bot', text: 'Type "help" to see all available commands, or just ask me about any district!', time: '18:32' },
@@ -108,7 +108,7 @@ export default function WhatsAppBot() {
           Bot
         </div>
         <div>
-          <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>EarlyAlert Bot</div>
+          <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>VyaadhiShield Bot</div>
           <div style={{ fontSize: '0.72rem', opacity: 0.8, display: 'flex', alignItems: 'center', gap: 5 }}>
             <span style={{ width: 7, height: 7, borderRadius: '50%', background: '#25d366', display: 'inline-block' }}></span>
             online

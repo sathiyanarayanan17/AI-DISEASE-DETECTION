@@ -69,8 +69,8 @@ export default function LandingPage() {
       {/* Navbar */}
       <nav style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', padding: '18px 48px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800, boxShadow: '0 0 20px rgba(99,102,241,0.4)' }}>EA</div>
-          <span style={{ fontSize: '1.05rem', fontWeight: 800, letterSpacing: '-0.02em' }}>EarlyAlert</span>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: 'linear-gradient(135deg, #6366f1, #8b5cf6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 800, boxShadow: '0 0 20px rgba(99,102,241,0.4)' }}>VS</div>
+          <span style={{ fontSize: '1.05rem', fontWeight: 800, letterSpacing: '-0.02em' }}>VyaadhiShield</span>
           <span style={{ fontSize: '0.6rem', background: 'rgba(99,102,241,0.15)', color: '#a5b4fc', padding: '2px 8px', borderRadius: 6, fontWeight: 600, marginLeft: 4 }}>v2.0</span>
         </div>
         <div style={{ display: 'flex', gap: 28, marginLeft: 48 }}>
@@ -316,7 +316,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer style={{ position: 'relative', zIndex: 5, padding: '32px 48px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ fontSize: '0.72rem', color: '#334155' }}>
-          EarlyAlert AI - Smart India Hackathon 2024 - Tamil Nadu
+          VyaadhiShield AI - Smart India Hackathon 2024 - Tamil Nadu
         </div>
         <div style={{ display: 'flex', gap: 20 }}>
           {['GitHub', 'API Docs', 'Contact'].map(l => (

@@ -42,9 +42,9 @@ function Sidebar({ highCount }) {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
-        <div className="logo-icon">EA</div>
+        <div className="logo-icon">VS</div>
         <div className="logo-text">
-          <div className="logo-name">EarlyAlert</div>
+          <div className="logo-name">VyaadhiShield</div>
           <div className="logo-sub">Tamil Nadu AI</div>
         </div>
       </div>
@@ -246,7 +246,7 @@ function AppContent() {
     '/settings':  { title: 'Settings', sub: 'Preferences' },
     '/login':     { title: 'Login', sub: 'Authentication' },
   };
-  const info = pageInfo[loc.pathname] || { title: 'EarlyAlert AI', sub: '' };
+  const info = pageInfo[loc.pathname] || { title: 'VyaadhiShield AI', sub: '' };
 
   useEffect(() => {
     const load = async () => {

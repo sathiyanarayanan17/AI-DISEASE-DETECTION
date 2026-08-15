@@ -17,7 +17,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://user:pass@db:5432/earlyalert
+      - DATABASE_URL=postgresql://user:pass@db:5432/vyaadhishield
       - REDIS_URL=redis://redis:6379
       - MODEL_PATH=/app/models/latest.pkl
     depends_on:
@@ -29,7 +29,7 @@ services:
     environment:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=pass
-      - POSTGRES_DB=earlyalert
+      - POSTGRES_DB=vyaadhishield
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
@@ -44,7 +44,7 @@ services:
     build: ./backend
     command: celery -A tasks worker --loglevel=info
     environment:
-      - DATABASE_URL=postgresql://user:pass@db:5432/earlyalert
+      - DATABASE_URL=postgresql://user:pass@db:5432/vyaadhishield
       - REDIS_URL=redis://redis:6379
     depends_on:
       - redis
@@ -54,7 +54,7 @@ volumes:
   pgdata:`;
 
 const ENV_VARS = [
-  { name: 'DATABASE_URL', description: 'PostgreSQL connection string', example: 'postgresql://user:pass@localhost:5432/earlyalert', required: true },
+  { name: 'DATABASE_URL', description: 'PostgreSQL connection string', example: 'postgresql://user:pass@localhost:5432/vyaadhishield', required: true },
   { name: 'REDIS_URL', description: 'Redis connection for caching and task queue', example: 'redis://localhost:6379', required: true },
   { name: 'MODEL_PATH', description: 'Path to trained ML model file', example: '/app/models/latest.pkl', required: true },
   { name: 'SENDGRID_API_KEY', description: 'SendGrid API key for email alerts', example: 'SG.xxxxx', required: false },
@@ -125,7 +125,7 @@ export default function DockerDeploy() {
         <div className="card-body" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px' }}>
           <div>
             <h2 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text1)', margin: 0 }}>Deployment Guide</h2>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text3)', margin: '4px 0 0' }}>Docker-based deployment for EarlyAlert system</p>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text3)', margin: '4px 0 0' }}>Docker-based deployment for VyaadhiShield system</p>
           </div>
           <span className="badge badge-low" style={{ fontSize: '0.78rem', padding: '6px 14px' }}>
             Ready for Production
