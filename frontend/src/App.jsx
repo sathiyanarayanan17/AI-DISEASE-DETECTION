@@ -40,10 +40,11 @@ import DockerDeployPage from './pages/DockerDeployPage';
 export const App = () => {
   return (
     <Routes>
-      <Route element={<AppLayout />}>
-        {/* 1. Landing */}
-        <Route path="/" element={<LandingPage />} />
+      {/* Landing page - standalone, no sidebar */}
+      <Route path="/" element={<LandingPage />} />
 
+      {/* All app pages inside layout with sidebar */}
+      <Route element={<AppLayout />}>
         {/* 2. Main Monitoring */}
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/alerts" element={<AlertsPage />} />
