@@ -140,32 +140,32 @@ export const LandingPage = () => {
 
         {/* Right side */}
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {/* Search */}
-          <div style={{
+          {/* Search - links to ranking page */}
+          <Link to="/ranking" style={{
             display: 'flex', alignItems: 'center', gap: '6px',
             background: 'var(--bg-input)', border: '1px solid var(--border-base)',
             borderRadius: 8, padding: '6px 12px', fontSize: '0.75rem', color: 'var(--text-muted)',
-            cursor: 'pointer', minWidth: 160
+            cursor: 'pointer', minWidth: 160, textDecoration: 'none'
           }}>
             <Search size={14} />
             <span>Search districts...</span>
-          </div>
+          </Link>
 
           {/* Theme Toggle */}
           <button onClick={toggleTheme} style={{
             background: 'var(--bg-input)', border: '1px solid var(--border-base)',
             borderRadius: 8, padding: '7px 10px', cursor: 'pointer',
             display: 'flex', alignItems: 'center', color: 'var(--text-secondary)'
-          }}>
+          }} title="Toggle theme">
             {darkMode ? <Sun size={16} /> : <Moon size={16} />}
           </button>
 
-          {/* Notifications */}
-          <button style={{
+          {/* Notifications - links to alerts */}
+          <Link to="/alerts" style={{
             background: 'var(--bg-input)', border: '1px solid var(--border-base)',
             borderRadius: 8, padding: '7px 10px', cursor: 'pointer',
             display: 'flex', alignItems: 'center', color: 'var(--text-secondary)',
-            position: 'relative'
+            position: 'relative', textDecoration: 'none'
           }}>
             <Bell size={16} />
             <span style={{
@@ -175,7 +175,7 @@ export const LandingPage = () => {
               fontSize: '0.55rem', fontWeight: 700,
               display: 'flex', alignItems: 'center', justifyContent: 'center'
             }}>{highRisk.length}</span>
-          </button>
+          </Link>
 
           {/* Login Button */}
           <Link to="/login" style={{
