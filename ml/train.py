@@ -1,104 +1,58 @@
 """
-HEAVY-DUTY ML TRAINING PIPELINE
-=================================
-Disease Outbreak Early Warning System - Tamil Nadu
-Smart India Hackathon (SIH)
-
-This is the PRODUCTION-GRADE model with:
-1. Optuna-tuned XGBoost (500 trees, early stopping)
-2. Optuna-tuned LightGBM (fast gradient boosting)
-3. Voting Ensemble (XGBoost + LightGBM + Random Forest)
-4. SMOTE class rebalancing
-5. Time-based split (no data leakage)
-6. 5-fold cross-validation with confidence intervals
-7. SHAP explainability
-8. Comprehensive evaluation (F1, AUC, precision, recall per class)
-
-HOW UPCOMING DATA IS PREDICTED:
-================================
-The trained model predicts FUTURE outbreak risk using:
-- Current weather readings (rainfall, temperature, humidity) from IMD
-- Historical rolling averages (7/14/30 day trends) computed from past data
-- Lag features (what happened 7/14/21 days ago - incubation period)
-- Case trend acceleration (is it growing?)
-- Seasonal patterns (monsoon, calendar features)
-- Geography (coastal/urban/hill)
-
-The model does NOT need future data - it uses ONLY past + present to forecast risk.
-Think of it like weather forecasting: you measure today's conditions and patterns
-to predict what's likely to happen in the next 7-14 days.
-
-PREDICTION FLOW FOR NEW DATA:
-1. Receive today's weather (from IMD API or manual input)
-2. Look up rolling averages from last 7/14/30 days of stored history
-3. Compute lag features from stored case data
-4. Compute trend (is it accelerating?)
-5. Add seasonal/geography features
-6. Feed 25 features into trained model
-7. Model outputs: P(Low), P(Medium), P(High) -> highest probability wins
-8. Return risk level + confidence + recommendation
+Early Warning System - ML Model Training Script
+Trains XGBoost, LightGBM, Random Forest, and Voting Ensemble
+for disease outbreak risk prediction across Tamil Nadu districts.
 """
 
 import os
 import sys
-import json
 import time
+import json
 import warnings
+import datetime
+import joblib
 import numpy as np
 import pandas as pd
-import joblib
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from sklearn.model_selection import (
-    StratifiedKFold, cross_val_score, learning_curve
-)
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import (
-    RandomForestClassifier, VotingClassifier, GradientBoostingClassifier
-)
+from sklearn.model_selection import cross_val_score, StratifiedKFold, learning_curve
 from sklearn.metrics import (
-    classification_report, f1_score, roc_auc_score, roc_curve, auc,
-    confusion_matrix, accuracy_score, precision_score, recall_score
+    accuracy_score, f1_score, roc_auc_score, classification_report,
+    confusion_matrix, roc_curve, auc, precision_recall_fscore_support
 )
-from sklearn.preprocessing import label_binarize, StandardScaler
-from sklearn.calibration import CalibratedClassifierCV
+from sklearn.ensemble import RandomForestClassifier, VotingClassifier
+from sklearn.preprocessing import label_binarize
+from xgboost import XGBClassifier
 from imblearn.over_sampling import SMOTE
 
-import xgboost as xgb
+warnings.filterwarnings('ignore')
 
-# Optional
+# Optional imports
 try:
-    import optuna
-    optuna.logging.set_verbosity(optuna.logging.WARNING)
-    HAS_OPTUNA = True
+    from lightgbm import LGBMClassifier
+    HAS_LGBM = True
+    print("[INFO] LightGBM available")
 except ImportError:
-    HAS_OPTUNA = False
-
-try:
-    import lightgbm as lgb
-    HAS_LIGHTGBM = True
-except ImportError:
-    HAS_LIGHTGBM = False
+    HAS_LGBM = False
+    print("[INFO] LightGBM not available, skipping")
 
 try:
     import shap
     HAS_SHAP = True
+    print("[INFO] SHAP available")
 except ImportError:
     HAS_SHAP = False
+    print("[INFO] SHAP not available, skipping explanations")
 
-warnings.filterwarnings('ignore')
+# ============================================================
+# CONFIGURATION
+# ============================================================
 
-# =============================================================================
-# PATHS & CONSTANTS
-# =============================================================================
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 DATA_PATH = os.path.join(PROJECT_ROOT, 'data', 'processed_data.csv')
 MODELS_DIR = os.path.join(PROJECT_ROOT, 'models')
-MODEL_PATH = os.path.join(MODELS_DIR, 'xgb_model.pkl')
-META_PATH = os.path.join(MODELS_DIR, 'metadata.pkl')
-METRICS_PATH = os.path.join(MODELS_DIR, 'metrics.json')
 PLOTS_DIR = os.path.join(MODELS_DIR, 'plots')
 
 os.makedirs(MODELS_DIR, exist_ok=True)
@@ -110,826 +64,743 @@ FEATURE_COLUMNS = [
     'lag_7_cases', 'lag_14_cases', 'lag_21_cases',
     'case_trend_7d',
     'cholera_cases_7d_avg', 'dengue_cases_7d_avg', 'malaria_cases_7d_avg',
-    'rainfall_7d_avg', 'rainfall_14d_avg', 'temp_7d_avg', 'humidity_7d_avg',
+    'rainfall_7d_avg', 'rainfall_14d_avg',
+    'temp_7d_avg', 'humidity_7d_avg',
     'month', 'week_of_year', 'day_of_year',
     'is_sw_monsoon', 'is_ne_monsoon',
-    'is_coastal', 'is_urban', 'is_hill',
+    'is_coastal', 'is_urban', 'is_hill'
 ]
 
 TARGET = 'risk_level'
 LABEL_MAP = {0: 'Low', 1: 'Medium', 2: 'High'}
-N_CLASSES = 3
-RANDOM_STATE = 42
-OPTUNA_TRIALS = 80  # More trials = better tuning
+NUM_CLASSES = len(LABEL_MAP)
+
+SPLIT_DATE = '2024-01-01'
 
 
-# =============================================================================
-# STEP 1: LOAD DATA & TIME-BASED SPLIT
-# =============================================================================
 def load_data():
-    """Load and split data using time-based approach."""
-    print("\n" + "=" * 70)
-    print(" STEP 1: LOADING DATA")
-    print("=" * 70)
+    """Load and validate processed data."""
+    print("\n" + "=" * 60)
+    print("STEP 1: Loading Data")
+    print("=" * 60)
+    start = time.time()
 
-    df = pd.read_csv(DATA_PATH, parse_dates=['date'])
-    df = df.sort_values(['district', 'date']).reset_index(drop=True)
+    if not os.path.exists(DATA_PATH):
+        print(f"[ERROR] Data file not found: {DATA_PATH}")
+        sys.exit(1)
 
-    print(f"  Dataset shape: {df.shape[0]:,} rows x {df.shape[1]} columns")
-    print(f"  Date range: {df['date'].min().date()} to {df['date'].max().date()}")
+    df = pd.read_csv(DATA_PATH)
+    df['date'] = pd.to_datetime(df['date'])
+
+    print(f"  Loaded {len(df):,} rows, {len(df.columns)} columns")
     print(f"  Districts: {df['district'].nunique()}")
-    print(f"\n  Class distribution:")
-    for k, v in df[TARGET].value_counts().sort_index().items():
-        print(f"    {LABEL_MAP[k]:6s} (class {k}): {v:6,} ({100*v/len(df):.1f}%)")
+    print(f"  Date range: {df['date'].min().date()} to {df['date'].max().date()}")
+    print(f"  Target distribution:")
+    for val, label in LABEL_MAP.items():
+        count = (df[TARGET] == val).sum()
+        print(f"    {label} ({val}): {count:,} ({100*count/len(df):.1f}%)")
 
-    # Time-based split: Train on 2022-2023, Test on 2024
-    # This simulates real deployment: model trained on past, predicts future
-    split_date = pd.Timestamp('2024-01-01')
-    train_df = df[df['date'] < split_date].copy()
-    test_df = df[df['date'] >= split_date].copy()
+    # Check for missing features
+    missing_cols = [c for c in FEATURE_COLUMNS if c not in df.columns]
+    if missing_cols:
+        print(f"[ERROR] Missing columns: {missing_cols}")
+        sys.exit(1)
 
-    print(f"\n  Time-based split:")
-    print(f"    Train: {len(train_df):,} samples ({train_df['date'].min().date()} to {train_df['date'].max().date()})")
-    print(f"    Test:  {len(test_df):,} samples ({test_df['date'].min().date()} to {test_df['date'].max().date()})")
-    print(f"    (Model NEVER sees 2024 data during training - simulates future prediction)")
-
-    X_train = train_df[FEATURE_COLUMNS].values.astype(np.float32)
-    y_train = train_df[TARGET].values.astype(np.int32)
-    X_test = test_df[FEATURE_COLUMNS].values.astype(np.float32)
-    y_test = test_df[TARGET].values.astype(np.int32)
-
-    districts = sorted(df['district'].unique().tolist())
-
-    return X_train, y_train, X_test, y_test, districts, df
+    elapsed = time.time() - start
+    print(f"  Done in {elapsed:.1f}s")
+    return df
 
 
-# =============================================================================
-# STEP 2: SMOTE REBALANCING
-# =============================================================================
+def split_data(df):
+    """Time-based train/test split."""
+    print("\n" + "=" * 60)
+    print("STEP 2: Train/Test Split (time-based)")
+    print("=" * 60)
+    start = time.time()
+
+    train_df = df[df['date'] < SPLIT_DATE].copy()
+    test_df = df[df['date'] >= SPLIT_DATE].copy()
+
+    X_train = train_df[FEATURE_COLUMNS].values
+    y_train = train_df[TARGET].values
+    X_test = test_df[FEATURE_COLUMNS].values
+    y_test = test_df[TARGET].values
+
+    print(f"  Train: {len(train_df):,} rows (before {SPLIT_DATE})")
+    print(f"  Test:  {len(test_df):,} rows (from {SPLIT_DATE} onwards)")
+    print(f"  Train target dist: {dict(zip(*np.unique(y_train, return_counts=True)))}")
+    print(f"  Test target dist:  {dict(zip(*np.unique(y_test, return_counts=True)))}")
+
+    elapsed = time.time() - start
+    print(f"  Done in {elapsed:.1f}s")
+    return X_train, X_test, y_train, y_test
+
+
 def apply_smote(X_train, y_train):
-    """Handle class imbalance with SMOTE oversampling."""
-    print("\n" + "=" * 70)
-    print(" STEP 2: CLASS REBALANCING (SMOTE)")
-    print("=" * 70)
+    """Apply SMOTE for class balancing."""
+    print("\n" + "=" * 60)
+    print("STEP 3: Applying SMOTE")
+    print("=" * 60)
+    start = time.time()
 
-    counts_before = dict(zip(*np.unique(y_train, return_counts=True)))
-    print(f"  Before SMOTE: {counts_before}")
+    print(f"  Before SMOTE: {len(X_train):,} samples")
+    smote = SMOTE(random_state=42)
+    X_resampled, y_resampled = smote.fit_resample(X_train, y_train)
+    print(f"  After SMOTE:  {len(X_resampled):,} samples")
+    print(f"  Resampled dist: {dict(zip(*np.unique(y_resampled, return_counts=True)))}")
 
-    k = min(5, min(np.bincount(y_train)) - 1)
-    smote = SMOTE(random_state=RANDOM_STATE, k_neighbors=max(1, k))
-    X_res, y_res = smote.fit_resample(X_train, y_train)
-
-    counts_after = dict(zip(*np.unique(y_res, return_counts=True)))
-    print(f"  After SMOTE:  {counts_after}")
-    print(f"  Added {len(X_res) - len(X_train):,} synthetic samples")
-
-    return X_res, y_res
+    elapsed = time.time() - start
+    print(f"  Done in {elapsed:.1f}s")
+    return X_resampled, y_resampled
 
 
-# =============================================================================
-# STEP 3: OPTUNA HYPERPARAMETER TUNING
-# =============================================================================
-def tune_xgboost_optuna(X_train, y_train):
-    """Aggressively tune XGBoost with 80 Optuna trials."""
-    print("\n" + "=" * 70)
-    print(" STEP 3: HYPERPARAMETER TUNING (OPTUNA)")
-    print("=" * 70)
+def train_xgboost(X_train, y_train, X_test, y_test):
+    """Train XGBoost with early stopping."""
+    print("\n  [XGBoost] Training...")
+    start = time.time()
 
-    if not HAS_OPTUNA:
-        print("  Optuna not installed - using carefully tuned defaults")
-        return {
-            'n_estimators': 800,
-            'max_depth': 7,
-            'learning_rate': 0.03,
-            'subsample': 0.85,
-            'colsample_bytree': 0.85,
-            'min_child_weight': 3,
-            'gamma': 0.05,
-            'reg_alpha': 0.1,
-            'reg_lambda': 1.5,
-        }
-
-    print(f"  Running {OPTUNA_TRIALS} trials of Bayesian optimization...")
-    print(f"  Search space: 9 hyperparameters, each trial = 5-fold CV")
-    t0 = time.time()
-
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE)
-
-    def objective(trial):
-        params = {
-            'n_estimators': trial.suggest_int('n_estimators', 300, 1200),
-            'max_depth': trial.suggest_int('max_depth', 4, 10),
-            'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.15, log=True),
-            'subsample': trial.suggest_float('subsample', 0.65, 0.95),
-            'colsample_bytree': trial.suggest_float('colsample_bytree', 0.65, 0.95),
-            'min_child_weight': trial.suggest_int('min_child_weight', 1, 8),
-            'gamma': trial.suggest_float('gamma', 0.0, 2.0),
-            'reg_alpha': trial.suggest_float('reg_alpha', 1e-6, 5.0, log=True),
-            'reg_lambda': trial.suggest_float('reg_lambda', 0.1, 10.0, log=True),
-        }
-
-        model = xgb.XGBClassifier(
-            **params,
-            objective='multi:softprob',
-            eval_metric='mlogloss',
-            random_state=RANDOM_STATE,
-            verbosity=0,
-            n_jobs=-1,
-        )
-
-        scores = cross_val_score(model, X_train, y_train, cv=cv,
-                                 scoring='f1_macro', n_jobs=-1)
-        return scores.mean()
-
-    study = optuna.create_study(direction='maximize', study_name='xgboost_heavy')
-    study.optimize(objective, n_trials=OPTUNA_TRIALS, show_progress_bar=False)
-
-    elapsed = time.time() - t0
-    print(f"  Completed in {elapsed:.0f}s")
-    print(f"  Best CV F1 (macro): {study.best_value:.4f}")
-    print(f"  Best params:")
-    for k, v in study.best_params.items():
-        print(f"    {k}: {v}")
-
-    return study.best_params
-
-
-def tune_lightgbm_optuna(X_train, y_train):
-    """Tune LightGBM with Optuna."""
-    if not HAS_OPTUNA or not HAS_LIGHTGBM:
-        print("  Using default LightGBM params")
-        return {
-            'n_estimators': 800,
-            'max_depth': 7,
-            'learning_rate': 0.03,
-            'subsample': 0.85,
-            'colsample_bytree': 0.85,
-            'min_child_samples': 15,
-            'reg_alpha': 0.1,
-            'reg_lambda': 1.5,
-            'num_leaves': 80,
-        }
-
-    print(f"\n  Tuning LightGBM ({OPTUNA_TRIALS} trials)...")
-    t0 = time.time()
-
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE)
-
-    def objective(trial):
-        params = {
-            'n_estimators': trial.suggest_int('n_estimators', 300, 1200),
-            'max_depth': trial.suggest_int('max_depth', 4, 10),
-            'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.15, log=True),
-            'subsample': trial.suggest_float('subsample', 0.65, 0.95),
-            'colsample_bytree': trial.suggest_float('colsample_bytree', 0.65, 0.95),
-            'min_child_samples': trial.suggest_int('min_child_samples', 5, 40),
-            'reg_alpha': trial.suggest_float('reg_alpha', 1e-6, 5.0, log=True),
-            'reg_lambda': trial.suggest_float('reg_lambda', 0.1, 10.0, log=True),
-            'num_leaves': trial.suggest_int('num_leaves', 30, 150),
-        }
-
-        model = lgb.LGBMClassifier(
-            **params,
-            objective='multiclass',
-            random_state=RANDOM_STATE,
-            verbosity=-1,
-            n_jobs=-1,
-        )
-
-        scores = cross_val_score(model, X_train, y_train, cv=cv,
-                                 scoring='f1_macro', n_jobs=-1)
-        return scores.mean()
-
-    study = optuna.create_study(direction='maximize', study_name='lightgbm_heavy')
-    study.optimize(objective, n_trials=OPTUNA_TRIALS, show_progress_bar=False)
-
-    elapsed = time.time() - t0
-    print(f"  LightGBM tuning completed in {elapsed:.0f}s")
-    print(f"  Best CV F1: {study.best_value:.4f}")
-
-    return study.best_params
-
-
-# =============================================================================
-# STEP 4: TRAIN MODELS
-# =============================================================================
-def train_models(X_train, y_train, X_test, y_test, xgb_params, lgb_params):
-    """Train all individual models + ensemble."""
-    print("\n" + "=" * 70)
-    print(" STEP 4: TRAINING MODELS")
-    print("=" * 70)
-
-    models = {}
-
-    # --- XGBoost (Optuna-tuned, heavy) ---
-    print("\n  [1/5] Training XGBoost (Optuna-tuned)...")
-    t0 = time.time()
-    xgb_model = xgb.XGBClassifier(
-        **xgb_params,
-        objective='multi:softprob',
+    xgb_model = XGBClassifier(
+        n_estimators=600,
+        max_depth=7,
+        learning_rate=0.03,
+        subsample=0.85,
+        colsample_bytree=0.85,
+        min_child_weight=3,
+        gamma=0.05,
+        reg_alpha=0.1,
+        reg_lambda=1.5,
         eval_metric='mlogloss',
-        random_state=RANDOM_STATE,
-        verbosity=0,
+        random_state=42,
         n_jobs=-1,
-        early_stopping_rounds=50,
+        verbosity=0,
+        early_stopping_rounds=50
     )
+
     xgb_model.fit(
         X_train, y_train,
         eval_set=[(X_test, y_test)],
-        verbose=False,
+        verbose=False
     )
-    models['XGBoost'] = xgb_model
-    print(f"        Done in {time.time()-t0:.1f}s | Trees: {xgb_model.best_iteration}")
 
-    # --- LightGBM (Optuna-tuned) ---
-    if HAS_LIGHTGBM:
-        print("\n  [2/5] Training LightGBM (Optuna-tuned)...")
-        t0 = time.time()
-        lgb_model = lgb.LGBMClassifier(
-            **lgb_params,
-            objective='multiclass',
-            random_state=RANDOM_STATE,
-            verbosity=-1,
-            n_jobs=-1,
-        )
-        lgb_model.fit(
-            X_train, y_train,
-            eval_set=[(X_test, y_test)],
-            callbacks=[lgb.early_stopping(50, verbose=False), lgb.log_evaluation(0)],
-        )
-        models['LightGBM'] = lgb_model
-        print(f"        Done in {time.time()-t0:.1f}s | Trees: {lgb_model.best_iteration_}")
-    else:
-        print("\n  [2/5] LightGBM not available, skipping")
+    elapsed = time.time() - start
+    print(f"  [XGBoost] Done in {elapsed:.1f}s (best iteration: {xgb_model.best_iteration})")
+    return xgb_model
 
-    # --- Random Forest (heavy) ---
-    print("\n  [3/5] Training Random Forest (1000 trees)...")
-    t0 = time.time()
+
+def train_lightgbm(X_train, y_train, X_test, y_test):
+    """Train LightGBM."""
+    if not HAS_LGBM:
+        return None
+
+    print("\n  [LightGBM] Training...")
+    start = time.time()
+
+    lgbm_model = LGBMClassifier(
+        n_estimators=600,
+        max_depth=7,
+        learning_rate=0.03,
+        subsample=0.85,
+        colsample_bytree=0.85,
+        min_child_samples=15,
+        reg_alpha=0.1,
+        reg_lambda=1.5,
+        num_leaves=80,
+        random_state=42,
+        verbosity=-1,
+        n_jobs=-1
+    )
+
+    lgbm_model.fit(
+        X_train, y_train,
+        eval_set=[(X_test, y_test)],
+        callbacks=[
+            __import__('lightgbm').early_stopping(50, verbose=False),
+            __import__('lightgbm').log_evaluation(period=0)
+        ]
+    )
+
+    elapsed = time.time() - start
+    best_iter = lgbm_model.best_iteration_ if hasattr(lgbm_model, 'best_iteration_') else 'N/A'
+    print(f"  [LightGBM] Done in {elapsed:.1f}s (best iteration: {best_iter})")
+    return lgbm_model
+
+
+def train_random_forest(X_train, y_train):
+    """Train Random Forest."""
+    print("\n  [Random Forest] Training...")
+    start = time.time()
+
     rf_model = RandomForestClassifier(
-        n_estimators=1000,
-        max_depth=15,
+        n_estimators=800,
+        max_depth=14,
         min_samples_split=4,
         min_samples_leaf=2,
-        max_features='sqrt',
-        random_state=RANDOM_STATE,
+        random_state=42,
         n_jobs=-1,
-        class_weight='balanced',
+        class_weight='balanced'
     )
+
     rf_model.fit(X_train, y_train)
-    models['RandomForest'] = rf_model
-    print(f"        Done in {time.time()-t0:.1f}s")
 
-    # --- Gradient Boosting (sklearn) ---
-    print("\n  [4/5] Training Gradient Boosting (sklearn)...")
-    t0 = time.time()
-    gb_model = GradientBoostingClassifier(
-        n_estimators=500,
-        max_depth=6,
-        learning_rate=0.05,
-        subsample=0.8,
-        min_samples_split=5,
-        random_state=RANDOM_STATE,
-    )
-    gb_model.fit(X_train, y_train)
-    models['GradientBoosting'] = gb_model
-    print(f"        Done in {time.time()-t0:.1f}s")
-
-    # --- Voting Ensemble ---
-    print("\n  [5/5] Building Soft Voting Ensemble...")
-    t0 = time.time()
-    ensemble_estimators = [
-        ('xgb', xgb.XGBClassifier(
-            **xgb_params, objective='multi:softprob',
-            eval_metric='mlogloss', random_state=RANDOM_STATE,
-            verbosity=0, n_jobs=-1)),
-        ('rf', RandomForestClassifier(
-            n_estimators=500, max_depth=12, random_state=RANDOM_STATE,
-            n_jobs=-1, class_weight='balanced')),
-    ]
-    if HAS_LIGHTGBM:
-        ensemble_estimators.append(
-            ('lgb', lgb.LGBMClassifier(
-                **lgb_params, objective='multiclass',
-                random_state=RANDOM_STATE, verbosity=-1, n_jobs=-1))
-        )
-
-    # Weighted voting: XGBoost gets more weight since it's usually best
-    weights = [3, 1, 2] if HAS_LIGHTGBM else [3, 1]
-
-    ensemble = VotingClassifier(
-        estimators=ensemble_estimators,
-        voting='soft',
-        weights=weights,
-        n_jobs=-1,
-    )
-    ensemble.fit(X_train, y_train)
-    models['Ensemble'] = ensemble
-    print(f"        Done in {time.time()-t0:.1f}s")
-    print(f"        Components: {[name for name, _ in ensemble_estimators]}")
-    print(f"        Weights: {weights}")
-
-    return models
+    elapsed = time.time() - start
+    print(f"  [Random Forest] Done in {elapsed:.1f}s")
+    return rf_model
 
 
-# =============================================================================
-# STEP 5: EVALUATE ALL MODELS
-# =============================================================================
-def evaluate_all(models, X_test, y_test):
-    """Comprehensive evaluation of all models."""
-    print("\n" + "=" * 70)
-    print(" STEP 5: MODEL EVALUATION")
-    print("=" * 70)
+def build_voting_ensemble(xgb_model, lgbm_model, rf_model, X_train, y_train):
+    """Build a manual soft-voting ensemble using already-trained models."""
+    print("\n  [Voting Ensemble] Building (manual averaging)...")
+    start = time.time()
 
-    results = {}
-    y_test_bin = label_binarize(y_test, classes=[0, 1, 2])
+    # Manual ensemble - averages predicted probabilities with weights
+    # This avoids sklearn VotingClassifier compatibility issues with XGBoost
+    class ManualEnsemble:
+        def __init__(self, models, weights):
+            self.models = models
+            self.weights = np.array(weights) / sum(weights)
+            self.classes_ = np.array([0, 1, 2])
 
-    print(f"\n  {'Model':<20s} {'Accuracy':>9s} {'F1(macro)':>10s} {'AUC(OvR)':>10s} {'Prec':>6s} {'Recall':>7s}")
-    print("  " + "-" * 66)
+        def predict_proba(self, X):
+            probas = []
+            for model, weight in zip(self.models, self.weights):
+                probas.append(model.predict_proba(X) * weight)
+            return sum(probas)
 
-    best_f1 = 0
-    best_model_name = None
+        def predict(self, X):
+            proba = self.predict_proba(X)
+            return np.argmax(proba, axis=1)
 
-    for name, model in models.items():
-        y_pred = model.predict(X_test)
-        y_proba = model.predict_proba(X_test)
+    models_list = [xgb_model, rf_model]
+    weights_list = [3, 1]
 
-        acc = accuracy_score(y_test, y_pred)
-        f1 = f1_score(y_test, y_pred, average='macro')
-        prec = precision_score(y_test, y_pred, average='macro')
-        rec = recall_score(y_test, y_pred, average='macro')
+    if lgbm_model is not None:
+        models_list = [xgb_model, lgbm_model, rf_model]
+        weights_list = [3, 2, 1]
 
-        try:
-            auc_score = roc_auc_score(y_test_bin, y_proba, multi_class='ovr', average='macro')
-        except Exception:
-            auc_score = 0.0
+    ensemble = ManualEnsemble(models_list, weights_list)
 
-        results[name] = {
-            'accuracy': acc, 'f1_macro': f1, 'auc_ovr': auc_score,
-            'precision': prec, 'recall': rec,
-            'y_pred': y_pred, 'y_proba': y_proba,
-        }
-
-        print(f"  {name:<20s} {acc:>9.4f} {f1:>10.4f} {auc_score:>10.4f} {prec:>6.4f} {rec:>7.4f}")
-
-        if f1 > best_f1:
-            best_f1 = f1
-            best_model_name = name
-
-    print(f"\n  >> BEST MODEL: {best_model_name} (F1={best_f1:.4f})")
-
-    return results, best_model_name
+    elapsed = time.time() - start
+    print(f"  [Voting Ensemble] Done in {elapsed:.1f}s")
+    print(f"  Weights: XGB={weights_list[0]}, " +
+          (f"LGB={weights_list[1]}, RF={weights_list[2]}" if lgbm_model else f"RF={weights_list[1]}"))
+    return ensemble
 
 
-# =============================================================================
-# STEP 6: CROSS-VALIDATION
-# =============================================================================
-def cross_validate(model, X_train, y_train, model_name):
-    """5-fold stratified cross-validation with confidence interval."""
-    print("\n" + "=" * 70)
-    print(f" STEP 6: 5-FOLD CROSS-VALIDATION ({model_name})")
-    print("=" * 70)
-
-    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE)
-    scores = cross_val_score(model, X_train, y_train, cv=cv,
-                             scoring='f1_macro', n_jobs=-1)
-
-    print(f"  Fold scores: {[f'{s:.4f}' for s in scores]}")
-    print(f"  Mean F1: {scores.mean():.4f} +/- {scores.std():.4f}")
-    print(f"  95% CI:  [{scores.mean() - 1.96*scores.std():.4f}, {scores.mean() + 1.96*scores.std():.4f}]")
-
-    return scores
-
-
-# =============================================================================
-# STEP 7: DETAILED CLASSIFICATION REPORT
-# =============================================================================
-def print_detailed_report(model, X_test, y_test, model_name):
-    """Print per-class precision, recall, F1 + confusion matrix."""
-    print("\n" + "=" * 70)
-    print(f" STEP 7: DETAILED REPORT ({model_name})")
-    print("=" * 70)
-
+def evaluate_model(model, X_test, y_test, model_name):
+    """Evaluate a model and return metrics."""
     y_pred = model.predict(X_test)
 
-    print(f"\n  Classification Report:")
-    print(classification_report(y_test, y_pred,
-                                target_names=['Low', 'Medium', 'High'],
-                                digits=4))
+    # Get probabilities
+    try:
+        y_proba = model.predict_proba(X_test)
+    except Exception:
+        y_proba = None
 
+    acc = accuracy_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred, average='macro')
+
+    # ROC AUC (one-vs-rest)
+    roc_auc = None
+    if y_proba is not None:
+        try:
+            y_test_bin = label_binarize(y_test, classes=list(LABEL_MAP.keys()))
+            roc_auc = roc_auc_score(y_test_bin, y_proba, average='macro', multi_class='ovr')
+        except Exception:
+            pass
+
+    # Per-class metrics
+    precision, recall, f1_per_class, support = precision_recall_fscore_support(
+        y_test, y_pred, labels=list(LABEL_MAP.keys())
+    )
+
+    report = classification_report(y_test, y_pred, target_names=list(LABEL_MAP.values()), output_dict=True)
     cm = confusion_matrix(y_test, y_pred)
-    print("  Confusion Matrix:")
-    print(f"  {'':10s} {'Pred Low':>10s} {'Pred Med':>10s} {'Pred High':>10s}")
-    for i, row in enumerate(cm):
-        print(f"  {'Actual '+LABEL_MAP[i]:10s} {row[0]:>10,} {row[1]:>10,} {row[2]:>10,}")
+
+    metrics = {
+        'model_name': model_name,
+        'accuracy': acc,
+        'f1_macro': f1,
+        'roc_auc_ovr': roc_auc,
+        'per_class': {},
+        'classification_report': report,
+        'confusion_matrix': cm.tolist(),
+        'y_pred': y_pred,
+        'y_proba': y_proba
+    }
+
+    for i, (val, label) in enumerate(LABEL_MAP.items()):
+        metrics['per_class'][label] = {
+            'precision': float(precision[i]),
+            'recall': float(recall[i]),
+            'f1': float(f1_per_class[i]),
+            'support': int(support[i])
+        }
 
     # Per-class AUC
-    y_test_bin = label_binarize(y_test, classes=[0, 1, 2])
-    y_proba = model.predict_proba(X_test)
+    if y_proba is not None:
+        y_test_bin = label_binarize(y_test, classes=list(LABEL_MAP.keys()))
+        per_class_auc = {}
+        for i, label in LABEL_MAP.items():
+            try:
+                per_class_auc[label] = float(roc_auc_score(y_test_bin[:, i], y_proba[:, i]))
+            except Exception:
+                per_class_auc[label] = None
+        metrics['per_class_auc'] = per_class_auc
 
-    print(f"\n  Per-class ROC-AUC:")
-    for i, name in LABEL_MAP.items():
-        try:
-            fpr, tpr, _ = roc_curve(y_test_bin[:, i], y_proba[:, i])
-            class_auc = auc(fpr, tpr)
-            print(f"    {name:8s}: {class_auc:.4f}")
-        except Exception:
-            print(f"    {name:8s}: N/A")
+    return metrics
 
 
-# =============================================================================
-# STEP 8: GENERATE PLOTS
-# =============================================================================
-def generate_plots(models, results, X_test, y_test, X_train, y_train, best_name):
-    """Generate all evaluation plots."""
-    print("\n" + "=" * 70)
-    print(" STEP 8: GENERATING PLOTS")
-    print("=" * 70)
+def train_all_models(X_train_smote, y_train_smote, X_test, y_test):
+    """Train all models and evaluate them."""
+    print("\n" + "=" * 60)
+    print("STEP 4: Training Models")
+    print("=" * 60)
+    start = time.time()
 
+    # Train individual models
+    xgb_model = train_xgboost(X_train_smote, y_train_smote, X_test, y_test)
+    lgbm_model = train_lightgbm(X_train_smote, y_train_smote, X_test, y_test)
+    rf_model = train_random_forest(X_train_smote, y_train_smote)
+
+    # Build voting ensemble
+    voting_model = build_voting_ensemble(xgb_model, lgbm_model, rf_model, X_train_smote, y_train_smote)
+
+    elapsed = time.time() - start
+    print(f"\n  All models trained in {elapsed:.1f}s")
+
+    # Evaluate all models
+    print("\n" + "=" * 60)
+    print("STEP 5: Evaluating Models")
+    print("=" * 60)
+
+    models = {
+        'XGBoost': xgb_model,
+        'Random Forest': rf_model,
+        'Voting Ensemble': voting_model
+    }
+    if lgbm_model is not None:
+        models['LightGBM'] = lgbm_model
+
+    all_metrics = {}
+    for name, model in models.items():
+        metrics = evaluate_model(model, X_test, y_test, name)
+        all_metrics[name] = metrics
+        auc_str = f"{metrics['roc_auc_ovr']:.4f}" if metrics['roc_auc_ovr'] else "N/A"
+        print(f"\n  {name}:")
+        print(f"    Accuracy: {metrics['accuracy']:.4f}")
+        print(f"    F1 Macro: {metrics['f1_macro']:.4f}")
+        print(f"    ROC AUC:  {auc_str}")
+        for label, class_metrics in metrics['per_class'].items():
+            print(f"    {label}: P={class_metrics['precision']:.3f} R={class_metrics['recall']:.3f} F1={class_metrics['f1']:.3f}")
+
+    # Select best model by F1 macro
+    best_name = max(all_metrics, key=lambda k: all_metrics[k]['f1_macro'])
     best_model = models[best_name]
-    y_test_bin = label_binarize(y_test, classes=[0, 1, 2])
-    y_proba = best_model.predict_proba(X_test)
+    best_metrics = all_metrics[best_name]
 
-    # --- ROC Curves ---
-    fig, ax = plt.subplots(figsize=(8, 6))
-    colors = ['#10b981', '#f59e0b', '#ef4444']
-    for i, (label, color) in enumerate(zip(['Low', 'Medium', 'High'], colors)):
-        fpr, tpr, _ = roc_curve(y_test_bin[:, i], y_proba[:, i])
-        roc_auc_val = auc(fpr, tpr)
-        ax.plot(fpr, tpr, color=color, lw=2.5,
-                label=f'{label} (AUC = {roc_auc_val:.3f})')
-    ax.plot([0, 1], [0, 1], 'k--', lw=1, alpha=0.5)
-    ax.set_xlabel('False Positive Rate', fontsize=11)
-    ax.set_ylabel('True Positive Rate', fontsize=11)
-    ax.set_title(f'ROC Curves - {best_name}', fontsize=13, fontweight='bold')
-    ax.legend(loc='lower right', fontsize=10)
-    ax.grid(True, alpha=0.3)
+    print(f"\n  >>> Best Model: {best_name} (F1 Macro: {best_metrics['f1_macro']:.4f})")
+
+    return models, all_metrics, best_name, best_model, best_metrics
+
+
+def cross_validate_best(best_model, X_train_smote, y_train_smote, best_name):
+    """5-fold cross-validation on the best model."""
+    print("\n" + "=" * 60)
+    print("STEP 6: Cross-Validation (5-fold)")
+    print("=" * 60)
+    start = time.time()
+
+    # Create a fresh model without early_stopping for CV (it needs eval_set)
+    if best_name == 'XGBoost':
+        import xgboost as xgb_cv
+        cv_model = xgb_cv.XGBClassifier(
+            n_estimators=600, max_depth=7, learning_rate=0.03,
+            subsample=0.85, colsample_bytree=0.85, min_child_weight=3,
+            gamma=0.05, reg_alpha=0.1, reg_lambda=1.5,
+            eval_metric='mlogloss', random_state=42, n_jobs=-1, verbosity=0
+        )
+    elif best_name == 'LightGBM':
+        import lightgbm as lgb_cv
+        cv_model = lgb_cv.LGBMClassifier(
+            n_estimators=600, max_depth=7, learning_rate=0.03,
+            subsample=0.85, colsample_bytree=0.85, min_child_samples=15,
+            reg_alpha=0.1, reg_lambda=1.5, num_leaves=80,
+            random_state=42, verbosity=-1, n_jobs=-1
+        )
+    else:
+        cv_model = RandomForestClassifier(
+            n_estimators=800, max_depth=14, random_state=42, n_jobs=-1
+        )
+
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    cv_scores = cross_val_score(cv_model, X_train_smote, y_train_smote, cv=cv, scoring='f1_macro', n_jobs=-1)
+
+    print(f"  Model: {best_name}")
+    print(f"  CV F1 Scores: {[f'{s:.4f}' for s in cv_scores]}")
+    print(f"  CV F1 Mean:   {cv_scores.mean():.4f} (+/- {cv_scores.std():.4f})")
+
+    elapsed = time.time() - start
+    print(f"  Done in {elapsed:.1f}s")
+    return cv_scores
+
+
+def plot_roc_curves(all_metrics, y_test):
+    """Plot ROC curves for each class and each model."""
+    print("\n  Generating ROC curves...")
+    fig, axes = plt.subplots(1, NUM_CLASSES, figsize=(15, 5))
+    y_test_bin = label_binarize(y_test, classes=list(LABEL_MAP.keys()))
+
+    colors = {'XGBoost': 'blue', 'LightGBM': 'green', 'Random Forest': 'orange', 'Voting Ensemble': 'red'}
+
+    for i, (class_idx, label) in enumerate(LABEL_MAP.items()):
+        ax = axes[i]
+        for model_name, metrics in all_metrics.items():
+            if metrics['y_proba'] is not None:
+                fpr, tpr, _ = roc_curve(y_test_bin[:, i], metrics['y_proba'][:, i])
+                roc_auc_val = auc(fpr, tpr)
+                color = colors.get(model_name, 'gray')
+                ax.plot(fpr, tpr, color=color, lw=2,
+                        label=f'{model_name} (AUC={roc_auc_val:.3f})')
+
+        ax.plot([0, 1], [0, 1], 'k--', lw=1)
+        ax.set_xlabel('False Positive Rate')
+        ax.set_ylabel('True Positive Rate')
+        ax.set_title(f'ROC - {label} Risk')
+        ax.legend(loc='lower right', fontsize=8)
+        ax.grid(True, alpha=0.3)
+
     plt.tight_layout()
-    plt.savefig(os.path.join(PLOTS_DIR, 'roc_curves.png'), dpi=150)
+    plt.savefig(os.path.join(PLOTS_DIR, 'roc_curves.png'), dpi=150, bbox_inches='tight')
     plt.close()
-    print("  Saved: roc_curves.png")
 
-    # --- Model Comparison Bar Chart ---
-    fig, ax = plt.subplots(figsize=(10, 5))
-    names = list(results.keys())
-    f1s = [results[n]['f1_macro'] for n in names]
-    aucs = [results[n]['auc_ovr'] for n in names]
-    x = np.arange(len(names))
-    w = 0.35
-    bars1 = ax.bar(x - w/2, f1s, w, label='F1 (macro)', color='#3b82f6', alpha=0.85)
-    bars2 = ax.bar(x + w/2, aucs, w, label='ROC-AUC', color='#10b981', alpha=0.85)
-    ax.set_xticks(x)
-    ax.set_xticklabels(names, rotation=15, ha='right', fontsize=9)
-    ax.set_ylim(0.7, 1.02)
+
+def plot_model_comparison(all_metrics):
+    """Bar chart comparing model performance."""
+    print("  Generating model comparison chart...")
+    model_names = list(all_metrics.keys())
+    f1_scores = [all_metrics[m]['f1_macro'] for m in model_names]
+    accuracies = [all_metrics[m]['accuracy'] for m in model_names]
+    auc_scores = [all_metrics[m]['roc_auc_ovr'] if all_metrics[m]['roc_auc_ovr'] else 0 for m in model_names]
+
+    x = np.arange(len(model_names))
+    width = 0.25
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+    bars1 = ax.bar(x - width, f1_scores, width, label='F1 Macro', color='steelblue')
+    bars2 = ax.bar(x, accuracies, width, label='Accuracy', color='coral')
+    bars3 = ax.bar(x + width, auc_scores, width, label='ROC AUC', color='seagreen')
+
+    ax.set_xlabel('Model')
     ax.set_ylabel('Score')
-    ax.set_title('Model Comparison - Heavy Training', fontweight='bold')
+    ax.set_title('Model Comparison')
+    ax.set_xticks(x)
+    ax.set_xticklabels(model_names, rotation=15, ha='right')
     ax.legend()
-    ax.axhline(0.95, color='red', linestyle='--', linewidth=0.8, alpha=0.5)
-    for bar in bars1:
-        ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.005,
-                f'{bar.get_height():.3f}', ha='center', va='bottom', fontsize=8)
-    for bar in bars2:
-        ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.005,
-                f'{bar.get_height():.3f}', ha='center', va='bottom', fontsize=8)
-    plt.tight_layout()
-    plt.savefig(os.path.join(PLOTS_DIR, 'model_comparison.png'), dpi=150)
-    plt.close()
-    print("  Saved: model_comparison.png")
+    ax.set_ylim(0, 1.05)
+    ax.grid(True, axis='y', alpha=0.3)
 
-    # --- Feature Importance ---
+    # Add value labels
+    for bars in [bars1, bars2, bars3]:
+        for bar in bars:
+            height = bar.get_height()
+            ax.annotate(f'{height:.3f}', xy=(bar.get_x() + bar.get_width() / 2, height),
+                        xytext=(0, 3), textcoords="offset points", ha='center', va='bottom', fontsize=8)
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(PLOTS_DIR, 'model_comparison.png'), dpi=150, bbox_inches='tight')
+    plt.close()
+
+
+def plot_feature_importance(best_model, best_name):
+    """Plot feature importance for best model."""
+    print("  Generating feature importance plot...")
+    importances = None
+
     if hasattr(best_model, 'feature_importances_'):
         importances = best_model.feature_importances_
     elif hasattr(best_model, 'estimators_'):
-        # Ensemble - use first XGBoost
-        for name_est, est in best_model.estimators_:
+        # For VotingClassifier, use first estimator with feature_importances_
+        for est in best_model.estimators_:
             if hasattr(est, 'feature_importances_'):
                 importances = est.feature_importances_
                 break
-    else:
-        importances = None
 
-    if importances is not None:
-        idx = np.argsort(importances)[-15:]
-        fig, ax = plt.subplots(figsize=(9, 7))
-        colors_fi = plt.cm.RdYlGn_r(importances[idx] / importances.max())
-        ax.barh([FEATURE_COLUMNS[i] for i in idx], importances[idx], color=colors_fi)
-        ax.set_xlabel('Importance (Gain)')
-        ax.set_title(f'Top 15 Features - {best_name}', fontweight='bold')
+    if importances is None:
+        print("  [WARN] Cannot extract feature importances")
+        return
+
+    # Sort by importance
+    indices = np.argsort(importances)[::-1]
+    top_n = min(20, len(FEATURE_COLUMNS))
+
+    fig, ax = plt.subplots(figsize=(10, 8))
+    top_indices = indices[:top_n]
+    ax.barh(range(top_n), importances[top_indices][::-1], color='steelblue')
+    ax.set_yticks(range(top_n))
+    ax.set_yticklabels([FEATURE_COLUMNS[i] for i in top_indices][::-1])
+    ax.set_xlabel('Importance')
+    ax.set_title(f'Top {top_n} Feature Importances ({best_name})')
+    ax.grid(True, axis='x', alpha=0.3)
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(PLOTS_DIR, 'feature_importance.png'), dpi=150, bbox_inches='tight')
+    plt.close()
+
+
+def plot_confusion_matrix(best_metrics, best_name):
+    """Plot confusion matrix for best model."""
+    print("  Generating confusion matrix...")
+    cm = np.array(best_metrics['confusion_matrix'])
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+    im = ax.imshow(cm, interpolation='nearest', cmap=plt.cm.Blues)
+    ax.figure.colorbar(im, ax=ax)
+
+    labels = list(LABEL_MAP.values())
+    ax.set(xticks=np.arange(cm.shape[1]),
+           yticks=np.arange(cm.shape[0]),
+           xticklabels=labels, yticklabels=labels,
+           title=f'Confusion Matrix - {best_name}',
+           ylabel='True Label',
+           xlabel='Predicted Label')
+
+    # Add text annotations
+    thresh = cm.max() / 2.
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            ax.text(j, i, format(cm[i, j], 'd'),
+                    ha="center", va="center",
+                    color="white" if cm[i, j] > thresh else "black")
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(PLOTS_DIR, 'confusion_matrix.png'), dpi=150, bbox_inches='tight')
+    plt.close()
+
+
+def plot_learning_curves(best_model, X_train, y_train, best_name):
+    """Plot learning curves."""
+    print("  Generating learning curves...")
+    try:
+        cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+        train_sizes, train_scores, val_scores = learning_curve(
+            best_model, X_train, y_train,
+            cv=cv, scoring='f1_macro',
+            train_sizes=np.linspace(0.1, 1.0, 8),
+            n_jobs=-1
+        )
+
+        train_mean = np.mean(train_scores, axis=1)
+        train_std = np.std(train_scores, axis=1)
+        val_mean = np.mean(val_scores, axis=1)
+        val_std = np.std(val_scores, axis=1)
+
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.fill_between(train_sizes, train_mean - train_std, train_mean + train_std, alpha=0.1, color='blue')
+        ax.fill_between(train_sizes, val_mean - val_std, val_mean + val_std, alpha=0.1, color='orange')
+        ax.plot(train_sizes, train_mean, 'o-', color='blue', label='Training Score')
+        ax.plot(train_sizes, val_mean, 'o-', color='orange', label='Validation Score')
+        ax.set_xlabel('Training Size')
+        ax.set_ylabel('F1 Macro Score')
+        ax.set_title(f'Learning Curves - {best_name}')
+        ax.legend(loc='lower right')
+        ax.grid(True, alpha=0.3)
+
         plt.tight_layout()
-        plt.savefig(os.path.join(PLOTS_DIR, 'feature_importance.png'), dpi=150)
+        plt.savefig(os.path.join(PLOTS_DIR, 'learning_curves.png'), dpi=150, bbox_inches='tight')
         plt.close()
-        print("  Saved: feature_importance.png")
-
-    # --- Learning Curves ---
-    print("  Generating learning curves (may take a minute)...")
-    train_sizes, train_scores, val_scores = learning_curve(
-        xgb.XGBClassifier(
-            n_estimators=300, max_depth=6, learning_rate=0.05,
-            random_state=RANDOM_STATE, verbosity=0, n_jobs=-1
-        ),
-        X_train, y_train,
-        train_sizes=np.linspace(0.1, 1.0, 8),
-        cv=5, scoring='f1_macro', n_jobs=-1
-    )
-
-    fig, ax = plt.subplots(figsize=(8, 5))
-    ax.fill_between(train_sizes, train_scores.mean(1) - train_scores.std(1),
-                    train_scores.mean(1) + train_scores.std(1), alpha=0.15, color='#3b82f6')
-    ax.fill_between(train_sizes, val_scores.mean(1) - val_scores.std(1),
-                    val_scores.mean(1) + val_scores.std(1), alpha=0.15, color='#10b981')
-    ax.plot(train_sizes, train_scores.mean(1), 'o-', color='#3b82f6', label='Training F1')
-    ax.plot(train_sizes, val_scores.mean(1), 'o-', color='#10b981', label='Validation F1')
-    ax.set_xlabel('Training Set Size')
-    ax.set_ylabel('F1 Score (macro)')
-    ax.set_title('Learning Curves - XGBoost', fontweight='bold')
-    ax.legend()
-    ax.grid(True, alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(os.path.join(PLOTS_DIR, 'learning_curves.png'), dpi=150)
-    plt.close()
-    print("  Saved: learning_curves.png")
-
-    # --- SHAP ---
-    if HAS_SHAP and hasattr(best_model, 'feature_importances_'):
-        print("  Generating SHAP explanations...")
-        try:
-            explainer = shap.TreeExplainer(best_model)
-            sample = X_test[:300]
-            shap_values = explainer.shap_values(sample)
-
-            fig, axes = plt.subplots(1, 3, figsize=(18, 6))
-            for i, (ax, cls_name) in enumerate(zip(axes, ['Low', 'Medium', 'High'])):
-                plt.sca(ax)
-                sv = shap_values[i] if isinstance(shap_values, list) else shap_values[:, :, i]
-                shap.summary_plot(sv, sample, feature_names=FEATURE_COLUMNS,
-                                  show=False, plot_type='dot', max_display=12)
-                ax.set_title(f'SHAP - {cls_name} Risk', fontweight='bold')
-            plt.suptitle('SHAP Feature Importance by Risk Class', fontsize=13, fontweight='bold')
-            plt.tight_layout()
-            plt.savefig(os.path.join(PLOTS_DIR, 'shap_summary.png'), dpi=120, bbox_inches='tight')
-            plt.close()
-            print("  Saved: shap_summary.png")
-
-            # Individual waterfall plots
-            for cls_idx, cls_name in LABEL_MAP.items():
-                try:
-                    sv = shap_values[cls_idx] if isinstance(shap_values, list) else shap_values[:, :, cls_idx]
-                    explanation = shap.Explanation(
-                        values=sv[0],
-                        base_values=explainer.expected_value[cls_idx] if isinstance(explainer.expected_value, list) else explainer.expected_value,
-                        data=sample[0],
-                        feature_names=FEATURE_COLUMNS,
-                    )
-                    fig, ax = plt.subplots(figsize=(10, 6))
-                    shap.plots.waterfall(explanation, max_display=12, show=False)
-                    plt.title(f'SHAP Waterfall - {cls_name} Risk (Sample Prediction)', fontweight='bold')
-                    plt.tight_layout()
-                    plt.savefig(os.path.join(PLOTS_DIR, f'shap_waterfall_{cls_name.lower()}.png'), dpi=120, bbox_inches='tight')
-                    plt.close()
-                    print(f"  Saved: shap_waterfall_{cls_name.lower()}.png")
-                except Exception:
-                    pass
-        except Exception as e:
-            print(f"  SHAP generation skipped: {e}")
-
-    # --- Confusion Matrix Heatmap ---
-    y_pred = best_model.predict(X_test)
-    cm = confusion_matrix(y_test, y_pred)
-    fig, ax = plt.subplots(figsize=(7, 6))
-    im = ax.imshow(cm, interpolation='nearest', cmap='Blues')
-    ax.set_xticks([0, 1, 2])
-    ax.set_yticks([0, 1, 2])
-    ax.set_xticklabels(['Pred Low', 'Pred Med', 'Pred High'])
-    ax.set_yticklabels(['Actual Low', 'Actual Med', 'Actual High'])
-    for i in range(3):
-        for j in range(3):
-            ax.text(j, i, f'{cm[i, j]:,}', ha='center', va='center',
-                    fontsize=14, fontweight='bold',
-                    color='white' if cm[i, j] > cm.max()/2 else 'black')
-    ax.set_title(f'Confusion Matrix - {best_name}', fontweight='bold')
-    plt.colorbar(im)
-    plt.tight_layout()
-    plt.savefig(os.path.join(PLOTS_DIR, 'confusion_matrix.png'), dpi=150)
-    plt.close()
-    print("  Saved: confusion_matrix.png")
+    except Exception as e:
+        print(f"  [WARN] Learning curves failed: {e}")
 
 
-# =============================================================================
-# STEP 9: SAVE MODEL + METADATA + METRICS
-# =============================================================================
-def save_artifacts(best_model, best_name, results, districts, xgb_params, cv_scores):
+def generate_plots(all_metrics, best_model, best_name, best_metrics, X_train, y_train, y_test):
+    """Generate all plots."""
+    print("\n" + "=" * 60)
+    print("STEP 7: Generating Plots")
+    print("=" * 60)
+    start = time.time()
+
+    plot_roc_curves(all_metrics, y_test)
+    plot_model_comparison(all_metrics)
+    plot_feature_importance(best_model, best_name)
+    plot_confusion_matrix(best_metrics, best_name)
+    plot_learning_curves(best_model, X_train, y_train, best_name)
+
+    elapsed = time.time() - start
+    print(f"  All plots saved to {PLOTS_DIR}")
+    print(f"  Done in {elapsed:.1f}s")
+
+
+def generate_shap_explanations(best_model, X_test, best_name):
+    """Generate SHAP explanations if available."""
+    if not HAS_SHAP:
+        return
+
+    print("\n" + "=" * 60)
+    print("STEP 8: SHAP Explanations")
+    print("=" * 60)
+    start = time.time()
+
+    try:
+        # Use a sample for speed
+        sample_size = min(500, len(X_test))
+        X_sample = X_test[:sample_size]
+
+        # Determine which model to explain
+        model_to_explain = best_model
+        if hasattr(best_model, 'estimators_'):
+            # For VotingClassifier, explain the first tree-based model
+            for est in best_model.estimators_:
+                if hasattr(est, 'feature_importances_'):
+                    model_to_explain = est
+                    break
+
+        explainer = shap.TreeExplainer(model_to_explain)
+        shap_values = explainer.shap_values(X_sample)
+
+        # Summary plot
+        fig, ax = plt.subplots(figsize=(12, 8))
+        feature_names = FEATURE_COLUMNS
+
+        # For multi-class, shap_values is a list
+        if isinstance(shap_values, list):
+            # Use class with highest mean absolute SHAP
+            shap_to_plot = shap_values[0]
+            for sv in shap_values[1:]:
+                if np.abs(sv).mean() > np.abs(shap_to_plot).mean():
+                    shap_to_plot = sv
+        else:
+            shap_to_plot = shap_values
+
+        plt.figure(figsize=(12, 8))
+        shap.summary_plot(
+            shap_to_plot,
+            X_sample,
+            feature_names=feature_names,
+            show=False,
+            max_display=20
+        )
+        plt.tight_layout()
+        plt.savefig(os.path.join(PLOTS_DIR, 'shap_summary.png'), dpi=150, bbox_inches='tight')
+        plt.close('all')
+
+        elapsed = time.time() - start
+        print(f"  SHAP summary plot saved")
+        print(f"  Done in {elapsed:.1f}s")
+
+    except Exception as e:
+        print(f"  [WARN] SHAP explanations failed: {e}")
+
+
+def save_artifacts(best_model, best_name, best_metrics, all_metrics, cv_scores, df):
     """Save model, metadata, and metrics."""
-    print("\n" + "=" * 70)
-    print(" STEP 9: SAVING ARTIFACTS")
-    print("=" * 70)
+    print("\n" + "=" * 60)
+    print("STEP 9: Saving Artifacts")
+    print("=" * 60)
+    start = time.time()
 
     # Save model
-    joblib.dump(best_model, MODEL_PATH)
-    print(f"  Model: {MODEL_PATH}")
-    model_size = os.path.getsize(MODEL_PATH)
-    print(f"         Size: {model_size/1024:.0f} KB")
+    model_path = os.path.join(MODELS_DIR, 'xgb_model.pkl')
+    joblib.dump(best_model, model_path)
+    print(f"  Model saved to: {model_path}")
 
     # Save metadata
     metadata = {
         'feature_columns': FEATURE_COLUMNS,
         'label_map': LABEL_MAP,
-        'test_f1': round(results[best_name]['f1_macro'], 4),
-        'test_auc': round(results[best_name]['auc_ovr'], 4),
+        'test_f1': float(best_metrics['f1_macro']),
+        'test_auc': float(best_metrics['roc_auc_ovr']) if best_metrics['roc_auc_ovr'] else None,
         'model_type': best_name,
-        'districts': districts,
-        'trained_on': f'Tamil Nadu -- 37 districts -- 2022-2024',
+        'districts': sorted(df['district'].unique().tolist()),
+        'trained_on': datetime.datetime.now().isoformat()
     }
-    joblib.dump(metadata, META_PATH)
-    print(f"  Metadata: {META_PATH}")
+    metadata_path = os.path.join(MODELS_DIR, 'metadata.pkl')
+    joblib.dump(metadata, metadata_path)
+    print(f"  Metadata saved to: {metadata_path}")
 
-    # Save comprehensive metrics JSON
-    best_res = results[best_name]
-    metrics = {
-        'model_type': best_name,
-        'accuracy': round(best_res['accuracy'], 6),
-        'f1_macro': round(best_res['f1_macro'], 6),
-        'f1_weighted': round(f1_score(
-            best_res['y_pred'], best_res['y_pred'],  # dummy - recalculate below
-            average='weighted'), 6),
-        'precision_macro': round(best_res['precision'], 6),
-        'recall_macro': round(best_res['recall'], 6),
-        'auc_ovr': round(best_res['auc_ovr'], 6),
-        'cv_f1_mean': round(cv_scores.mean(), 6),
-        'cv_f1_std': round(cv_scores.std(), 6),
-        'confusion_matrix': confusion_matrix(
-            # We need y_test for this - pass it through
-            [0], [0]).tolist(),  # placeholder
-        'feature_columns': FEATURE_COLUMNS,
-        'label_map': {str(k): v for k, v in LABEL_MAP.items()},
-        'districts': districts,
-        'trained_on': str(pd.Timestamp.now()),
-        'best_params': xgb_params if best_name == 'XGBoost' else {},
-        'all_models': {
-            name: {
-                'f1_macro': round(res['f1_macro'], 4),
-                'accuracy': round(res['accuracy'], 4),
-                'auc_ovr': round(res['auc_ovr'], 4),
-            }
-            for name, res in results.items()
+    # Save metrics.json
+    metrics_json = {
+        'best_model': best_name,
+        'best_f1_macro': float(best_metrics['f1_macro']),
+        'best_accuracy': float(best_metrics['accuracy']),
+        'best_roc_auc_ovr': float(best_metrics['roc_auc_ovr']) if best_metrics['roc_auc_ovr'] else None,
+        'classification_report': best_metrics['classification_report'],
+        'per_class_auc': best_metrics.get('per_class_auc', {}),
+        'confusion_matrix': best_metrics['confusion_matrix'],
+        'cv_f1_scores': cv_scores.tolist() if cv_scores is not None else [],
+        'cv_f1_mean': float(cv_scores.mean()) if cv_scores is not None else None,
+        'cv_f1_std': float(cv_scores.std()) if cv_scores is not None else None,
+        'all_model_scores': {}
+    }
+
+    for model_name, metrics in all_metrics.items():
+        metrics_json['all_model_scores'][model_name] = {
+            'accuracy': float(metrics['accuracy']),
+            'f1_macro': float(metrics['f1_macro']),
+            'roc_auc_ovr': float(metrics['roc_auc_ovr']) if metrics['roc_auc_ovr'] else None,
+            'per_class': metrics['per_class']
         }
-    }
 
-    with open(METRICS_PATH, 'w') as f:
-        json.dump(metrics, f, indent=2)
-    print(f"  Metrics: {METRICS_PATH}")
+    metrics_path = os.path.join(MODELS_DIR, 'metrics.json')
+    with open(metrics_path, 'w') as f:
+        json.dump(metrics_json, f, indent=2)
+    print(f"  Metrics saved to: {metrics_path}")
 
-    return metadata
+    elapsed = time.time() - start
+    print(f"  Done in {elapsed:.1f}s")
+
+    return model_path, metadata_path, metrics_path
 
 
-# =============================================================================
-# MAIN
-# =============================================================================
 def main():
-    print("\n")
-    print("=" * 70)
-    print(" HEAVY-DUTY ML TRAINING PIPELINE")
-    print(" Disease Outbreak Early Warning System - Tamil Nadu")
-    print(" Smart India Hackathon (SIH)")
-    print("=" * 70)
-    print(f" Time: {pd.Timestamp.now()}")
-    print(f" Python: {sys.version.split()[0]}")
-    print(f" XGBoost: {xgb.__version__}")
-    if HAS_LIGHTGBM:
-        print(f" LightGBM: {lgb.__version__}")
-    if HAS_OPTUNA:
-        print(f" Optuna: {optuna.__version__}")
-    print(f" Features: {len(FEATURE_COLUMNS)}")
-    print(f" Optuna trials: {OPTUNA_TRIALS}")
-
+    """Main training pipeline."""
     total_start = time.time()
 
+    print("=" * 60)
+    print("  EARLY WARNING SYSTEM - MODEL TRAINING")
+    print("  Tamil Nadu Disease Outbreak Risk Prediction")
+    print("=" * 60)
+    print(f"  Started: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"  Project Root: {PROJECT_ROOT}")
+
     # Step 1: Load data
-    X_train, y_train, X_test, y_test, districts, df = load_data()
+    df = load_data()
 
-    # Step 2: SMOTE
-    X_train_sm, y_train_sm = apply_smote(X_train, y_train)
+    # Step 2: Split data
+    X_train, X_test, y_train, y_test = split_data(df)
 
-    # Step 3: Tune hyperparameters
-    xgb_params = tune_xgboost_optuna(X_train_sm, y_train_sm)
+    # Step 3: SMOTE
+    X_train_smote, y_train_smote = apply_smote(X_train, y_train)
 
-    if HAS_LIGHTGBM:
-        lgb_params = tune_lightgbm_optuna(X_train_sm, y_train_sm)
-    else:
-        lgb_params = {}
+    # Step 4-5: Train and evaluate
+    models, all_metrics, best_name, best_model, best_metrics = train_all_models(
+        X_train_smote, y_train_smote, X_test, y_test
+    )
 
-    # Step 4: Train all models
-    models = train_models(X_train_sm, y_train_sm, X_test, y_test, xgb_params, lgb_params)
+    # Step 6: Cross-validation
+    cv_scores = cross_validate_best(best_model, X_train_smote, y_train_smote, best_name)
 
-    # Step 5: Evaluate
-    results, best_name = evaluate_all(models, X_test, y_test)
+    # Step 7: Plots
+    generate_plots(all_metrics, best_model, best_name, best_metrics, X_train_smote, y_train_smote, y_test)
 
-    # Step 6: Cross-validation on best model
-    best_model = models[best_name]
-    # For CV, use a fresh clone
-    if best_name == 'XGBoost':
-        cv_model = xgb.XGBClassifier(
-            **xgb_params, objective='multi:softprob',
-            eval_metric='mlogloss', random_state=RANDOM_STATE, verbosity=0, n_jobs=-1
-        )
-    elif best_name == 'LightGBM' and HAS_LIGHTGBM:
-        cv_model = lgb.LGBMClassifier(
-            **lgb_params, objective='multiclass',
-            random_state=RANDOM_STATE, verbosity=-1, n_jobs=-1
-        )
-    else:
-        cv_model = RandomForestClassifier(
-            n_estimators=500, max_depth=12, random_state=RANDOM_STATE, n_jobs=-1
-        )
-    cv_scores = cross_validate(cv_model, X_train_sm, y_train_sm, best_name)
-
-    # Step 7: Detailed report
-    print_detailed_report(best_model, X_test, y_test, best_name)
-
-    # Step 8: Plots
-    generate_plots(models, results, X_test, y_test, X_train_sm, y_train_sm, best_name)
+    # Step 8: SHAP
+    generate_shap_explanations(best_model, X_test, best_name)
 
     # Step 9: Save
-    # Fix metrics - need y_test for confusion matrix
-    results[best_name]['y_test'] = y_test
-    save_artifacts(best_model, best_name, results, districts, xgb_params, cv_scores)
+    save_artifacts(best_model, best_name, best_metrics, all_metrics, cv_scores, df)
 
-    # Update metrics.json with real confusion matrix
-    y_pred_final = best_model.predict(X_test)
-    y_proba_final = best_model.predict_proba(X_test)
-    y_test_bin = label_binarize(y_test, classes=[0, 1, 2])
-
-    metrics_update = {
-        'model_type': best_name,
-        'accuracy': round(accuracy_score(y_test, y_pred_final), 6),
-        'f1_macro': round(f1_score(y_test, y_pred_final, average='macro'), 6),
-        'f1_weighted': round(f1_score(y_test, y_pred_final, average='weighted'), 6),
-        'precision_macro': round(precision_score(y_test, y_pred_final, average='macro'), 6),
-        'recall_macro': round(recall_score(y_test, y_pred_final, average='macro'), 6),
-        'auc_ovr': round(roc_auc_score(y_test_bin, y_proba_final, multi_class='ovr', average='macro'), 6),
-        'cv_f1_mean': round(cv_scores.mean(), 6),
-        'cv_f1_std': round(cv_scores.std(), 6),
-        'confusion_matrix': confusion_matrix(y_test, y_pred_final).tolist(),
-        'classification_report': classification_report(y_test, y_pred_final,
-                                                        target_names=['Low', 'Medium', 'High'],
-                                                        output_dict=True),
-        'feature_columns': FEATURE_COLUMNS,
-        'label_map': {str(k): v for k, v in LABEL_MAP.items()},
-        'districts': districts,
-        'trained_on': str(pd.Timestamp.now()),
-        'best_params': xgb_params,
-        'all_models': {
-            name: {'f1_macro': round(res['f1_macro'], 4), 'accuracy': round(res['accuracy'], 4), 'auc_ovr': round(res['auc_ovr'], 4)}
-            for name, res in results.items() if name != best_name or True
-        },
-    }
-    # Per-class AUC
-    for i, cls_name in LABEL_MAP.items():
-        try:
-            fpr, tpr, _ = roc_curve(y_test_bin[:, i], y_proba_final[:, i])
-            metrics_update[f'auc_class_{cls_name}'] = round(auc(fpr, tpr), 6)
-        except Exception:
-            pass
-
-    with open(METRICS_PATH, 'w') as f:
-        json.dump(metrics_update, f, indent=2)
-
-    total_time = time.time() - total_start
-
-    print("\n" + "=" * 70)
-    print(" TRAINING COMPLETE!")
-    print("=" * 70)
-    print(f"  Best Model:      {best_name}")
-    print(f"  Test Accuracy:   {results[best_name]['accuracy']:.4f} ({results[best_name]['accuracy']*100:.1f}%)")
-    print(f"  Test F1 (macro): {results[best_name]['f1_macro']:.4f}")
-    print(f"  Test ROC-AUC:    {results[best_name]['auc_ovr']:.4f}")
-    print(f"  CV F1 (5-fold):  {cv_scores.mean():.4f} +/- {cv_scores.std():.4f}")
-    print(f"  Total time:      {total_time:.0f}s ({total_time/60:.1f} min)")
-    print(f"  Model saved:     {MODEL_PATH}")
-    print(f"  Plots saved:     {PLOTS_DIR}/")
-    print("=" * 70)
-
-    print("\n")
-    print("  HOW THIS MODEL PREDICTS UPCOMING/FUTURE DATA:")
-    print("  " + "-" * 55)
-    print("  1. Receive today's weather (rainfall, temp, humidity)")
-    print("     -> from IMD API or manual sensor input")
-    print("  2. Compute rolling averages from past 7/14/30 days")
-    print("     -> stored in database/CSV, updated daily")
-    print("  3. Compute lag features (cases 7/14/21 days ago)")
-    print("     -> from IDSP disease case database")
-    print("  4. Compute trend (7-day case acceleration)")
-    print("     -> is the outbreak growing or declining?")
-    print("  5. Add seasonal info (month, monsoon, day_of_year)")
-    print("  6. Add geography (coastal/urban/hill flag)")
-    print("  7. Feed 25 features into XGBoost model")
-    print("  8. Model outputs probabilities:")
-    print("     P(Low)=0.05, P(Medium)=0.25, P(High)=0.70")
-    print("  9. Highest probability -> predicted risk level")
-    print("     -> 'High' risk with 70% confidence")
-    print(" 10. Generate recommendation + alert")
-    print("")
-    print("  The model uses ONLY past+present data to predict future risk.")
-    print("  No crystal ball needed - just patterns learned from 3 years of data!")
-    print("")
+    # Final summary
+    total_elapsed = time.time() - total_start
+    print("\n" + "=" * 60)
+    print("  TRAINING COMPLETE")
+    print("=" * 60)
+    print(f"  Best Model:    {best_name}")
+    print(f"  Test F1 Macro: {best_metrics['f1_macro']:.4f}")
+    print(f"  Test Accuracy: {best_metrics['accuracy']:.4f}")
+    auc_str = f"{best_metrics['roc_auc_ovr']:.4f}" if best_metrics['roc_auc_ovr'] else "N/A"
+    print(f"  Test ROC AUC:  {auc_str}")
+    print(f"  CV F1 Mean:    {cv_scores.mean():.4f} (+/- {cv_scores.std():.4f})")
+    print(f"  Total Time:    {total_elapsed:.1f}s")
+    print("=" * 60)
 
 
 if __name__ == '__main__':

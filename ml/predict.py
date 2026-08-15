@@ -1,6 +1,6 @@
 """
 predict.py
-Inference module for the AI Early Warning System.
+Inference module for the AI Early Warning System (Tamil Nadu).
 
 Public API
 ----------
@@ -12,7 +12,7 @@ predict_all_districts(date_str)         -> list[dict]
 
 Constants
 ---------
-DISTRICTS       : list of 30 Indian city names
+DISTRICTS       : list of 37 Tamil Nadu district names
 DISTRICT_COORDS : dict  {district: [lat, lng]}
 """
 
@@ -26,73 +26,112 @@ import numpy as np
 
 warnings.filterwarnings("ignore")
 
-# ── Paths ─────────────────────────────────────────────────────────────────────
-SCRIPT_DIR   = os.path.dirname(os.path.abspath(__file__))
+# -- Paths ------------------------------------------------------------------
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
-MODELS_DIR   = os.path.join(PROJECT_ROOT, "models")
-MODEL_PATH   = os.path.join(MODELS_DIR, "xgb_model.pkl")
-META_PATH    = os.path.join(MODELS_DIR, "metadata.pkl")
+MODELS_DIR = os.path.join(PROJECT_ROOT, "models")
+MODEL_PATH = os.path.join(MODELS_DIR, "xgb_model.pkl")
+META_PATH = os.path.join(MODELS_DIR, "metadata.pkl")
 
-# ── District catalogue ────────────────────────────────────────────────────────
+# -- District catalogue (37 Tamil Nadu districts) ---------------------------
 DISTRICTS: list[str] = [
-    "Chennai", "Mumbai", "Delhi", "Kolkata", "Bengaluru",
-    "Hyderabad", "Pune", "Ahmedabad", "Jaipur", "Lucknow",
-    "Kanpur", "Nagpur", "Indore", "Thane", "Bhopal",
-    "Visakhapatnam", "Pimpri", "Patna", "Vadodara", "Ghaziabad",
-    "Ludhiana", "Agra", "Nashik", "Faridabad", "Meerut",
-    "Rajkot", "Kalyan", "Vasai", "Varanasi", "Srinagar",
+    "Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem",
+    "Tirunelveli", "Vellore", "Erode", "Thoothukudi", "Tiruppur",
+    "Dindigul", "Thanjavur", "Sivagangai", "Kancheepuram", "Krishnagiri",
+    "Dharmapuri", "Cuddalore", "Nagapattinam", "Villupuram", "Perambalur",
+    "Ariyalur", "Karur", "Namakkal", "Ramanathapuram", "Virudhunagar",
+    "Tiruvannamalai", "Tiruvarur", "Pudukkottai", "Nilgiris", "Kallakurichi",
+    "Chengalpattu", "Tenkasi", "Mayiladuthurai", "Tirupattur", "Ranipet",
+    "Kanyakumari", "Puducherry",
 ]
 
 DISTRICT_COORDS: dict[str, list[float]] = {
-    "Chennai":        [13.08,  80.27],
-    "Mumbai":         [19.07,  72.87],
-    "Delhi":          [28.61,  77.20],
-    "Kolkata":        [22.57,  88.36],
-    "Bengaluru":      [12.97,  77.59],
-    "Hyderabad":      [17.38,  78.48],
-    "Pune":           [18.52,  73.85],
-    "Ahmedabad":      [23.02,  72.57],
-    "Jaipur":         [26.91,  75.79],
-    "Lucknow":        [26.84,  80.94],
-    "Kanpur":         [26.44,  80.33],
-    "Nagpur":         [21.14,  79.08],
-    "Indore":         [22.71,  75.85],
-    "Thane":          [19.21,  72.97],
-    "Bhopal":         [23.25,  77.40],
-    "Visakhapatnam":  [17.68,  83.21],
-    "Pimpri":         [18.62,  73.80],
-    "Patna":          [25.59,  85.13],
-    "Vadodara":       [22.30,  73.19],
-    "Ghaziabad":      [28.66,  77.43],
-    "Ludhiana":       [30.90,  75.85],
-    "Agra":           [27.17,  78.01],
-    "Nashik":         [19.99,  73.79],
-    "Faridabad":      [28.40,  77.31],
-    "Meerut":         [28.98,  77.70],
-    "Rajkot":         [22.30,  70.78],
-    "Kalyan":         [19.24,  73.13],
-    "Vasai":          [19.36,  72.82],
-    "Varanasi":       [25.31,  82.97],
-    "Srinagar":       [34.08,  74.79],
+    "Chennai":          [13.08, 80.27],
+    "Coimbatore":       [11.00, 76.96],
+    "Madurai":          [9.93, 78.12],
+    "Tiruchirappalli":  [10.79, 78.70],
+    "Salem":            [11.65, 78.16],
+    "Tirunelveli":      [8.73, 77.70],
+    "Vellore":          [12.92, 79.13],
+    "Erode":            [11.34, 77.73],
+    "Thoothukudi":      [8.76, 78.13],
+    "Tiruppur":         [11.10, 77.34],
+    "Dindigul":         [10.36, 77.97],
+    "Thanjavur":        [10.79, 79.14],
+    "Sivagangai":       [9.84, 78.48],
+    "Kancheepuram":     [12.83, 79.70],
+    "Krishnagiri":      [12.52, 78.22],
+    "Dharmapuri":       [12.13, 78.16],
+    "Cuddalore":        [11.75, 79.77],
+    "Nagapattinam":     [10.76, 79.84],
+    "Villupuram":       [11.94, 79.49],
+    "Perambalur":       [11.23, 78.88],
+    "Ariyalur":         [11.14, 79.08],
+    "Karur":            [10.96, 78.08],
+    "Namakkal":         [11.22, 78.17],
+    "Ramanathapuram":   [9.37, 78.83],
+    "Virudhunagar":     [9.58, 77.96],
+    "Tiruvannamalai":   [12.22, 79.07],
+    "Tiruvarur":        [10.77, 79.64],
+    "Pudukkottai":      [10.38, 78.82],
+    "Nilgiris":         [11.41, 76.69],
+    "Kallakurichi":     [11.74, 78.96],
+    "Chengalpattu":     [12.69, 79.98],
+    "Tenkasi":          [8.96, 77.32],
+    "Mayiladuthurai":   [11.10, 79.65],
+    "Tirupattur":       [12.49, 78.57],
+    "Ranipet":          [12.93, 79.33],
+    "Kanyakumari":      [8.08, 77.55],
+    "Puducherry":       [11.94, 79.83],
 }
 
-# ── Risk catalogue ────────────────────────────────────────────────────────────
+# -- Geography flags --------------------------------------------------------
+COASTAL_DISTRICTS: set[str] = {
+    "Chennai", "Cuddalore", "Nagapattinam", "Tiruvarur",
+    "Ramanathapuram", "Thoothukudi", "Kancheepuram", "Chengalpattu",
+    "Mayiladuthurai", "Villupuram", "Puducherry",
+}
+
+HILL_DISTRICTS: set[str] = {"Nilgiris"}
+
+URBAN_DISTRICTS: set[str] = {
+    "Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem", "Tiruppur",
+}
+
+# -- Feature columns expected by the model ----------------------------------
+FEATURE_COLUMNS: list[str] = [
+    "rainfall_mm", "temperature_c", "humidity_pct",
+    "rolling_7d_cases", "rolling_14d_cases", "rolling_30d_cases",
+    "lag_7_cases", "lag_14_cases", "lag_21_cases",
+    "case_trend_7d",
+    "cholera_cases_7d_avg", "dengue_cases_7d_avg", "malaria_cases_7d_avg",
+    "rainfall_7d_avg", "rainfall_14d_avg", "temp_7d_avg", "humidity_7d_avg",
+    "month", "week_of_year", "day_of_year",
+    "is_sw_monsoon", "is_ne_monsoon",
+    "is_coastal", "is_urban", "is_hill",
+]
+
+# -- Risk catalogue ---------------------------------------------------------
 LABEL_MAP: dict[int, str] = {0: "Low", 1: "Medium", 2: "High"}
 
 RISK_COLORS: dict[str, str] = {
-    "Low":    "#2ECC71",   # green
-    "Medium": "#F39C12",   # amber
-    "High":   "#E74C3C",   # red
+    "Low": "#22c55e",
+    "Medium": "#f59e0b",
+    "High": "#ef4444",
 }
 
 RECOMMENDATIONS: dict[str, str] = {
-    "Low":    "No immediate action required. Maintain routine surveillance.",
+    "Low": "No immediate action required. Maintain routine surveillance.",
     "Medium": "Increase disease surveillance. Issue health advisory to local clinics.",
-    "High":   "Deploy rapid response team immediately. Issue public health emergency alert.",
+    "High": "Deploy rapid response team immediately. Issue public health emergency alert.",
 }
 
+# -- Cached model -----------------------------------------------------------
+_cached_model = None
+_cached_metadata = None
 
-# ── Model loader ──────────────────────────────────────────────────────────────
+
+# -- Model loader -----------------------------------------------------------
 def load_model():
     """
     Load XGBoost model and metadata from the models/ directory.
@@ -101,65 +140,91 @@ def load_model():
     -------
     (model, metadata) on success, or (None, None) if files are missing.
     """
+    global _cached_model, _cached_metadata
+
+    if _cached_model is not None and _cached_metadata is not None:
+        return _cached_model, _cached_metadata
+
     try:
         import joblib
         if not os.path.exists(MODEL_PATH) or not os.path.exists(META_PATH):
             return None, None
-        model    = joblib.load(MODEL_PATH)
-        metadata = joblib.load(META_PATH)
-        return model, metadata
+        _cached_model = joblib.load(MODEL_PATH)
+        _cached_metadata = joblib.load(META_PATH)
+        return _cached_model, _cached_metadata
     except Exception as exc:
-        print(f"[predict] Warning: could not load model – {exc}")
+        print(f"[predict] Warning: could not load model - {exc}")
         return None, None
 
 
-# ── Seasonal averages (used when real-time data is unavailable) ───────────────
+# -- Seasonal averages (heuristic when real-time data is unavailable) -------
 def _seasonal_values(district: str, day_of_year: int) -> dict:
     """
-    Return approximate seasonal weather / case values for a district on
-    the given day-of-year.  These are rough heuristics, not real observations.
+    Return approximate seasonal weather and case values for a district
+    on the given day-of-year. These are rough heuristics used to fill
+    rolling/lag features when live data is unavailable.
     """
-    # Monsoon signal (peaks early August, doy ~213)
-    monsoon = max(0.0, math.sin(math.pi * (day_of_year - 60) / 180))
+    # Southwest monsoon signal (Jun-Sep, peaks around doy 213)
+    sw_monsoon = max(0.0, math.sin(math.pi * (day_of_year - 150) / 120)) if 150 <= day_of_year <= 270 else 0.0
+    # Northeast monsoon signal (Oct-Dec, peaks around doy 305)
+    ne_monsoon = max(0.0, math.sin(math.pi * (day_of_year - 270) / 90)) if 270 <= day_of_year <= 360 else 0.0
 
-    coastal_factor = {
-        "Chennai": 1.4, "Mumbai": 1.8, "Kolkata": 1.5,
-        "Visakhapatnam": 1.3, "Thane": 1.6, "Kalyan": 1.5,
-        "Vasai": 1.5, "Pimpri": 1.2,
-    }.get(district, 1.0)
-    if district in ("Delhi", "Ghaziabad", "Faridabad", "Meerut",
-                     "Agra", "Kanpur", "Lucknow", "Varanasi"):
-        coastal_factor *= 0.8
-    if district == "Srinagar":
-        coastal_factor *= 0.4
+    # Tamil Nadu gets more rain from NE monsoon (coastal districts especially)
+    is_coastal = district in COASTAL_DISTRICTS
+    is_hill = district in HILL_DISTRICTS
+    is_urban = district in URBAN_DISTRICTS
 
-    rainfall    = round(monsoon * 18 * coastal_factor, 2)
-    temperature = round(28 + 8 * math.sin(2 * math.pi * (day_of_year - 60) / 365), 1)
-    humidity    = round(min(98, 55 + 30 * monsoon), 1)
+    coastal_factor = 1.5 if is_coastal else 1.0
+    hill_factor = 1.3 if is_hill else 1.0
 
-    # Simple rolling approximation: recent cases scale with rainfall × humidity
-    rolling_7d  = round((rainfall * 0.4 + humidity * 0.15) * (2.5 if 152 <= day_of_year <= 304 else 1.0), 2)
-    rolling_14d = rolling_7d * 1.05
-    rolling_30d = rolling_7d * 1.10
-    lag_7        = rolling_7d * 0.9
-    lag_14       = rolling_7d * 0.8
+    # NE monsoon dominates in TN; SW monsoon is weaker here
+    monsoon_intensity = (sw_monsoon * 0.4 + ne_monsoon * 1.0) * coastal_factor * hill_factor
+
+    rainfall = round(monsoon_intensity * 20, 2)
+    temperature = round(30 + 5 * math.sin(2 * math.pi * (day_of_year - 100) / 365), 1)
+    if is_hill:
+        temperature = round(temperature - 10, 1)
+    humidity = round(min(98, 60 + 30 * monsoon_intensity), 1)
+
+    # Case estimates scale with rainfall and humidity
+    case_factor = 2.5 if (152 <= day_of_year <= 360) else 1.0
+    rolling_7d = round((rainfall * 0.4 + humidity * 0.15) * case_factor, 2)
+    rolling_14d = round(rolling_7d * 1.05, 2)
+    rolling_30d = round(rolling_7d * 1.10, 2)
+    lag_7 = round(rolling_7d * 0.9, 2)
+    lag_14 = round(rolling_7d * 0.8, 2)
+    lag_21 = round(rolling_7d * 0.7, 2)
+    case_trend_7d = round(rolling_7d - lag_7, 2)
+
+    # Disease-specific approximations
+    cholera_avg = round(rolling_7d * 0.15, 2)
+    dengue_avg = round(rolling_7d * 0.45, 2)
+    malaria_avg = round(rolling_7d * 0.25, 2)
+
+    rainfall_14d_avg = round(rainfall * 0.95, 2)
 
     return {
-        "rainfall_mm":     rainfall,
-        "temperature_c":   temperature,
-        "humidity_pct":    humidity,
-        "rolling_7d_cases":  rolling_7d,
+        "rainfall_mm": rainfall,
+        "temperature_c": temperature,
+        "humidity_pct": humidity,
+        "rolling_7d_cases": rolling_7d,
         "rolling_14d_cases": rolling_14d,
         "rolling_30d_cases": rolling_30d,
-        "lag_7_cases":       lag_7,
-        "lag_14_cases":      lag_14,
-        "rainfall_7d_avg":   rainfall,
-        "temp_7d_avg":       temperature,
-        "humidity_7d_avg":   humidity,
+        "lag_7_cases": lag_7,
+        "lag_14_cases": lag_14,
+        "lag_21_cases": lag_21,
+        "case_trend_7d": case_trend_7d,
+        "cholera_cases_7d_avg": cholera_avg,
+        "dengue_cases_7d_avg": dengue_avg,
+        "malaria_cases_7d_avg": malaria_avg,
+        "rainfall_7d_avg": rainfall,
+        "rainfall_14d_avg": rainfall_14d_avg,
+        "temp_7d_avg": temperature,
+        "humidity_7d_avg": humidity,
     }
 
 
-# ── Core prediction ───────────────────────────────────────────────────────────
+# -- Core prediction --------------------------------------------------------
 def predict_risk(
     district: str,
     date_str: str,
@@ -175,11 +240,11 @@ def predict_risk(
 
     Parameters
     ----------
-    district    : One of the 30 city names in DISTRICTS.
+    district    : One of the 37 district names in DISTRICTS.
     date_str    : ISO date string, e.g. '2025-07-15'.
     rainfall    : Observed rainfall in mm.
-    temperature : Temperature in °C.
-    humidity    : Relative humidity %.
+    temperature : Temperature in degrees C.
+    humidity    : Relative humidity percent.
     _model      : Pre-loaded model (optional, avoids repeated IO).
     _metadata   : Pre-loaded metadata (optional).
 
@@ -195,43 +260,66 @@ def predict_risk(
     except ValueError:
         parsed_date = date.today()
 
-    doy   = parsed_date.timetuple().tm_yday
+    doy = parsed_date.timetuple().tm_yday
     month = parsed_date.month
+    week_of_year = parsed_date.isocalendar()[1]
 
     # Load model lazily if not supplied
-    model    = _model
+    model = _model
     metadata = _metadata
     if model is None or metadata is None:
         model, metadata = load_model()
 
-    # ── Mock path: model not available ────────────────────────────────────────
+    # Mock path: model not available
     if model is None:
         return _mock_prediction(district, date_str, rainfall, temperature, humidity, doy)
 
-    feature_columns: list[str] = metadata["feature_columns"]
+    # Determine feature columns from metadata or use default
+    feature_columns = metadata.get("feature_columns", FEATURE_COLUMNS)
 
-    # Build seasonal estimates for rolling / lag features we don't have live
+    # Build seasonal estimates for rolling/lag features
     seasonal = _seasonal_values(district, doy)
 
+    # Geography flags
+    is_coastal = 1 if district in COASTAL_DISTRICTS else 0
+    is_urban = 1 if district in URBAN_DISTRICTS else 0
+    is_hill = 1 if district in HILL_DISTRICTS else 0
+
+    # Monsoon flags
+    is_sw_monsoon = 1 if 152 <= doy <= 273 else 0  # Jun 1 - Sep 30
+    is_ne_monsoon = 1 if 274 <= doy <= 365 or 1 <= doy <= 31 else 0  # Oct 1 - Dec 31
+
     feature_row: dict = {
-        "rainfall_mm":       rainfall,
-        "temperature_c":     temperature,
-        "humidity_pct":      humidity,
-        "rolling_7d_cases":  seasonal["rolling_7d_cases"],
+        "rainfall_mm": rainfall,
+        "temperature_c": temperature,
+        "humidity_pct": humidity,
+        "rolling_7d_cases": seasonal["rolling_7d_cases"],
         "rolling_14d_cases": seasonal["rolling_14d_cases"],
         "rolling_30d_cases": seasonal["rolling_30d_cases"],
-        "lag_7_cases":       seasonal["lag_7_cases"],
-        "lag_14_cases":      seasonal["lag_14_cases"],
-        "rainfall_7d_avg":   (rainfall + seasonal["rainfall_7d_avg"]) / 2,
-        "temp_7d_avg":       (temperature + seasonal["temp_7d_avg"]) / 2,
-        "humidity_7d_avg":   (humidity + seasonal["humidity_7d_avg"]) / 2,
-        "month":             month,
-        "day_of_year":       doy,
+        "lag_7_cases": seasonal["lag_7_cases"],
+        "lag_14_cases": seasonal["lag_14_cases"],
+        "lag_21_cases": seasonal["lag_21_cases"],
+        "case_trend_7d": seasonal["case_trend_7d"],
+        "cholera_cases_7d_avg": seasonal["cholera_cases_7d_avg"],
+        "dengue_cases_7d_avg": seasonal["dengue_cases_7d_avg"],
+        "malaria_cases_7d_avg": seasonal["malaria_cases_7d_avg"],
+        "rainfall_7d_avg": (rainfall + seasonal["rainfall_7d_avg"]) / 2,
+        "rainfall_14d_avg": (rainfall + seasonal["rainfall_14d_avg"]) / 2,
+        "temp_7d_avg": (temperature + seasonal["temp_7d_avg"]) / 2,
+        "humidity_7d_avg": (humidity + seasonal["humidity_7d_avg"]) / 2,
+        "month": month,
+        "week_of_year": week_of_year,
+        "day_of_year": doy,
+        "is_sw_monsoon": is_sw_monsoon,
+        "is_ne_monsoon": is_ne_monsoon,
+        "is_coastal": is_coastal,
+        "is_urban": is_urban,
+        "is_hill": is_hill,
     }
 
-    X = np.array([[feature_row[c] for c in feature_columns]], dtype=float)
+    X = np.array([[feature_row.get(c, 0) for c in feature_columns]], dtype=float)
     pred_class = int(model.predict(X)[0])
-    proba      = model.predict_proba(X)[0]
+    proba = model.predict_proba(X)[0]
 
     risk_label = LABEL_MAP.get(pred_class, "Low")
     confidence = float(proba[pred_class])
@@ -240,21 +328,21 @@ def predict_risk(
     # Low=0-33, Medium=34-66, High=67-100
     base_scores = {0: 15, 1: 50, 2: 85}
     score_range = {0: 33, 1: 32, 2: 33}
-    risk_score  = int(base_scores[pred_class] + (confidence - 0.5) * score_range[pred_class])
-    risk_score  = max(0, min(100, risk_score))
+    risk_score = int(base_scores[pred_class] + (confidence - 0.5) * score_range[pred_class])
+    risk_score = max(0, min(100, risk_score))
 
     return {
-        "district":       district,
-        "date":           date_str,
-        "risk_level":     risk_label,
-        "risk_score":     risk_score,
-        "confidence":     round(confidence, 4),
-        "color":          RISK_COLORS[risk_label],
+        "district": district,
+        "date": date_str,
+        "risk_level": risk_label,
+        "risk_score": risk_score,
+        "confidence": round(confidence, 4),
+        "color": RISK_COLORS[risk_label],
         "recommendation": RECOMMENDATIONS[risk_label],
     }
 
 
-# ── Batch: all districts ──────────────────────────────────────────────────────
+# -- Batch: all districts ---------------------------------------------------
 def predict_all_districts(date_str: str) -> list[dict]:
     """
     Predict risk for every district using average seasonal values.
@@ -297,7 +385,7 @@ def predict_all_districts(date_str: str) -> list[dict]:
     return results
 
 
-# ── Mock prediction (no model file) ──────────────────────────────────────────
+# -- Mock prediction (no model file) ----------------------------------------
 def _mock_prediction(
     district: str,
     date_str: str,
@@ -308,45 +396,52 @@ def _mock_prediction(
 ) -> dict:
     """
     Returns a rule-based heuristic when the trained model is absent.
-    Intended for development / demo purposes only.
+    Intended for development/demo purposes only.
     """
-    # Simple heuristic: high rainfall + humidity → higher risk
-    score = rainfall * 0.5 + humidity * 0.3 + (temperature - 20) * 0.2
+    # Coastal and monsoon factors increase risk
+    coastal_bonus = 5 if district in COASTAL_DISTRICTS else 0
+    monsoon_bonus = 8 if (274 <= doy <= 365) else 0  # NE monsoon season
+
+    score = rainfall * 0.5 + humidity * 0.3 + (temperature - 20) * 0.2 + coastal_bonus + monsoon_bonus
+
     if score > 30:
-        level, risk_score = "High",   int(min(100, 67 + (score - 30)))
+        level = "High"
+        risk_score = int(min(100, 67 + (score - 30)))
     elif score > 15:
-        level, risk_score = "Medium", int(min(66, 34 + (score - 15)))
+        level = "Medium"
+        risk_score = int(min(66, 34 + (score - 15)))
     else:
-        level, risk_score = "Low",    int(max(0, score))
+        level = "Low"
+        risk_score = int(max(0, score))
 
     return {
-        "district":       district,
-        "date":           date_str,
-        "risk_level":     level,
-        "risk_score":     risk_score,
-        "confidence":     0.0,           # unknown without model
-        "color":          RISK_COLORS[level],
+        "district": district,
+        "date": date_str,
+        "risk_level": level,
+        "risk_score": risk_score,
+        "confidence": 0.0,
+        "color": RISK_COLORS[level],
         "recommendation": RECOMMENDATIONS[level],
-        "_note":          "Mock prediction – model not loaded.",
     }
 
 
-# ── Quick self-test ───────────────────────────────────────────────────────────
+# -- Quick self-test --------------------------------------------------------
 if __name__ == "__main__":
     print("=" * 60)
-    print("  predict.py – self-test")
+    print("  predict.py - self-test (Tamil Nadu 37 districts)")
     print("=" * 60)
 
     test_date = "2025-07-20"
 
     # Single district
     result = predict_risk("Chennai", test_date, rainfall=45.0, temperature=31.0, humidity=88.0)
-    print(f"\nSingle prediction → {result}")
+    print(f"\nSingle prediction: {result}")
 
     # All districts
-    print(f"\nBatch prediction for all {len(DISTRICTS)} districts on {test_date} …")
+    print(f"\nBatch prediction for all {len(DISTRICTS)} districts on {test_date}...")
     all_preds = predict_all_districts(test_date)
     for p in all_preds:
-        print(f"  {p['district']:<18s} | {p['risk_level']:6s} | score={p['risk_score']:3d} | {p['recommendation'][:50]}…")
+        print(f"  {p['district']:<18s} | {p['risk_level']:6s} | score={p['risk_score']:3d} | {p['recommendation'][:50]}")
 
-    print("\n✓ predict.py self-test complete.")
+    print(f"\nTotal districts: {len(DISTRICTS)}")
+    print("predict.py self-test complete.")

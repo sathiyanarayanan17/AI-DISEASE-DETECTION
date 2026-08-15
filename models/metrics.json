@@ -1,145 +1,172 @@
 {
-  "model_type": "XGBoost",
-  "accuracy": 0.9623414884078392,
-  "f1_macro": 0.9595845017435364,
-  "f1_weighted": 0.9623169981153157,
-  "precision_macro": 0.9600076715990736,
-  "recall_macro": 0.9592115848377022,
-  "confusion_matrix": [
-    [
-      894,
-      50,
-      0
-    ],
-    [
-      44,
-      3579,
-      121
-    ],
-    [
-      0,
-      79,
-      3040
-    ]
-  ],
+  "best_model": "XGBoost",
+  "best_f1_macro": 0.9721194567486279,
+  "best_accuracy": 0.973859105006646,
+  "best_roc_auc_ovr": 0.998293693118122,
   "classification_report": {
     "Low": {
-      "precision": 0.9530916844349681,
-      "recall": 0.9470338983050848,
-      "f1-score": 0.9500531349628055,
-      "support": 944.0
+      "precision": 0.9874354561101549,
+      "recall": 0.9859082316549235,
+      "f1-score": 0.9866712529022272,
+      "support": 5819.0
     },
     "Medium": {
-      "precision": 0.9652103559870551,
-      "recall": 0.9559294871794872,
-      "f1-score": 0.9605475040257649,
-      "support": 3744.0
+      "precision": 0.9630281690140845,
+      "recall": 0.9596491228070175,
+      "f1-score": 0.961335676625659,
+      "support": 4560.0
     },
     "High": {
-      "precision": 0.9617209743751978,
-      "recall": 0.9746713690285348,
-      "f1-score": 0.9681528662420382,
-      "support": 3119.0
+      "precision": 0.9645545796737767,
+      "recall": 0.9721783117293709,
+      "f1-score": 0.9683514407179972,
+      "support": 3163.0
     },
-    "accuracy": 0.9623414884078392,
+    "accuracy": 0.973859105006646,
     "macro avg": {
-      "precision": 0.9600076715990736,
-      "recall": 0.9592115848377022,
-      "f1-score": 0.9595845017435364,
-      "support": 7807.0
+      "precision": 0.971672734932672,
+      "recall": 0.9725785553971039,
+      "f1-score": 0.9721194567486279,
+      "support": 13542.0
     },
     "weighted avg": {
-      "precision": 0.9623509468423703,
-      "recall": 0.9623414884078392,
-      "f1-score": 0.9623169981153157,
-      "support": 7807.0
+      "precision": 0.9738725081463131,
+      "recall": 0.973859105006646,
+      "f1-score": 0.973861048075771,
+      "support": 13542.0
     }
   },
-  "auc_ovr": 0.9970613023998558,
-  "auc_class_Low": 0.9984947532457269,
-  "auc_class_Medium": 0.9950021272858462,
-  "auc_class_High": 0.9976870266679944,
-  "feature_columns": [
-    "rainfall_mm",
-    "temperature_c",
-    "humidity_pct",
-    "rolling_7d_cases",
-    "rolling_14d_cases",
-    "rolling_30d_cases",
-    "lag_7_cases",
-    "lag_14_cases",
-    "lag_21_cases",
-    "case_trend_7d",
-    "cholera_cases_7d_avg",
-    "dengue_cases_7d_avg",
-    "malaria_cases_7d_avg",
-    "rainfall_7d_avg",
-    "rainfall_14d_avg",
-    "temp_7d_avg",
-    "humidity_7d_avg",
-    "month",
-    "week_of_year",
-    "day_of_year",
-    "is_sw_monsoon",
-    "is_ne_monsoon",
-    "is_coastal",
-    "is_urban",
-    "is_hill"
-  ],
-  "label_map": {
-    "0": "Low",
-    "1": "Medium",
-    "2": "High"
+  "per_class_auc": {
+    "Low": 0.9992973541669443,
+    "Medium": 0.9967857498622977,
+    "High": 0.9987979753251242
   },
-  "districts": [
-    "Ariyalur",
-    "Chengalpattu",
-    "Chennai",
-    "Coimbatore",
-    "Cuddalore",
-    "Dharmapuri",
-    "Dindigul",
-    "Erode",
-    "Kallakurichi",
-    "Kancheepuram",
-    "Kanyakumari",
-    "Karur",
-    "Krishnagiri",
-    "Madurai",
-    "Mayiladuthurai",
-    "Nagapattinam",
-    "Namakkal",
-    "Nilgiris",
-    "Perambalur",
-    "Puducherry",
-    "Pudukkottai",
-    "Ramanathapuram",
-    "Ranipet",
-    "Salem",
-    "Sivagangai",
-    "Tenkasi",
-    "Thanjavur",
-    "Thoothukudi",
-    "Tiruchirappalli",
-    "Tirunelveli",
-    "Tirupattur",
-    "Tiruppur",
-    "Tiruvannamalai",
-    "Tiruvarur",
-    "Vellore",
-    "Villupuram",
-    "Virudhunagar"
+  "confusion_matrix": [
+    [
+      5737,
+      81,
+      1
+    ],
+    [
+      72,
+      4376,
+      112
+    ],
+    [
+      1,
+      87,
+      3075
+    ]
   ],
-  "trained_on": "2026-08-13 13:48:23",
-  "best_params": {
-    "n_estimators": 500,
-    "max_depth": 6,
-    "learning_rate": 0.05,
-    "subsample": 0.8,
-    "colsample_bytree": 0.8,
-    "min_child_weight": 3,
-    "gamma": 0.1,
-    "reg_alpha": 0.1,
-    "reg_lambda": 1.0
+  "cv_f1_scores": [
+    0.9820901557157372,
+    0.9796760802020722,
+    0.9826182068467174,
+    0.9830811067412375,
+    0.977589470305146
+  ],
+  "cv_f1_mean": 0.981011003962182,
+  "cv_f1_std": 0.0020747004191762008,
+  "all_model_scores": {
+    "XGBoost": {
+      "accuracy": 0.973859105006646,
+      "f1_macro": 0.9721194567486279,
+      "roc_auc_ovr": 0.998293693118122,
+      "per_class": {
+        "Low": {
+          "precision": 0.9874354561101549,
+          "recall": 0.9859082316549235,
+          "f1": 0.9866712529022272,
+          "support": 5819
+        },
+        "Medium": {
+          "precision": 0.9630281690140845,
+          "recall": 0.9596491228070175,
+          "f1": 0.961335676625659,
+          "support": 4560
+        },
+        "High": {
+          "precision": 0.9645545796737767,
+          "recall": 0.9721783117293709,
+          "f1": 0.9683514407179972,
+          "support": 3163
+        }
+      }
+    },
+    "Random Forest": {
+      "accuracy": 0.9700930438635357,
+      "f1_macro": 0.9682934967367239,
+      "roc_auc_ovr": 0.9975871752619666,
+      "per_class": {
+        "Low": {
+          "precision": 0.9846868547832072,
+          "recall": 0.9835023199862519,
+          "f1": 0.9840942309345714,
+          "support": 5819
+        },
+        "Medium": {
+          "precision": 0.9605583868823399,
+          "recall": 0.9506578947368421,
+          "f1": 0.9555824975201146,
+          "support": 4560
+        },
+        "High": {
+          "precision": 0.9571028908921355,
+          "recall": 0.9734429339234903,
+          "f1": 0.965203761755486,
+          "support": 3163
+        }
+      }
+    },
+    "Voting Ensemble": {
+      "accuracy": 0.9734160389898094,
+      "f1_macro": 0.9717295327819605,
+      "roc_auc_ovr": 0.9983311907902629,
+      "per_class": {
+        "Low": {
+          "precision": 0.9869191049913941,
+          "recall": 0.9853926791544939,
+          "f1": 0.9861553014016683,
+          "support": 5819
+        },
+        "Medium": {
+          "precision": 0.9631834215167548,
+          "recall": 0.9581140350877193,
+          "f1": 0.9606420404573439,
+          "support": 4560
+        },
+        "High": {
+          "precision": 0.9633917396745932,
+          "recall": 0.9734429339234903,
+          "f1": 0.968391256486869,
+          "support": 3163
+        }
+      }
+    },
+    "LightGBM": {
+      "accuracy": 0.9734160389898094,
+      "f1_macro": 0.9715480927823882,
+      "roc_auc_ovr": 0.9983857402534385,
+      "per_class": {
+        "Low": {
+          "precision": 0.9877775865037012,
+          "recall": 0.9860800824884001,
+          "f1": 0.9869281045751634,
+          "support": 5819
+        },
+        "Medium": {
+          "precision": 0.9627589246364037,
+          "recall": 0.9581140350877193,
+          "f1": 0.9604308639261376,
+          "support": 4560
+        },
+        "High": {
+          "precision": 0.9624413145539906,
+          "recall": 0.9721783117293709,
+          "f1": 0.9672853098458635,
+          "support": 3163
+        }
+      }
+    }
   }
 }
