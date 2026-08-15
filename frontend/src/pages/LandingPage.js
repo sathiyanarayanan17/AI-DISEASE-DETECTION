@@ -90,7 +90,7 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section - Two Column */}
-      <section style={{ position: 'relative', zIndex: 5, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, padding: '80px 48px 40px', maxWidth: 1300, margin: '0 auto', alignItems: 'center' }}>
+      <section style={{ position: 'relative', zIndex: 5, display: 'grid', gridTemplateColumns: '1.1fr 1fr', gap: 20, padding: '70px 32px 40px', maxWidth: '100%', margin: '0 auto', alignItems: 'center' }}>
         
         {/* Left - Text */}
         <div>
@@ -139,7 +139,7 @@ export default function LandingPage() {
         </div>
 
         {/* Right - Floating Dashboard Cards */}
-        <div style={{ position: 'relative', height: 500 }}>
+        <div style={{ position: 'relative', height: 520, marginRight: 20 }}>
           
           {/* Card 1 - Risk Score */}
           <FloatingCard style={{ position: 'absolute', top: 0, right: 20, width: 220 }} delay={0}>
@@ -200,11 +200,44 @@ export default function LandingPage() {
               {time.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
             </div>
           </FloatingCard>
+
+          {/* Card 7 - Districts Active */}
+          <FloatingCard style={{ position: 'absolute', bottom: 60, left: -20, width: 170 }} delay={2.5}>
+            <div style={{ fontSize: '0.6rem', color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 6 }}>Districts Online</div>
+            <div style={{ display: 'flex', gap: 3, flexWrap: 'wrap' }}>
+              {Array.from({length: 37}).map((_, i) => (
+                <div key={i} style={{ width: 6, height: 6, borderRadius: 2, background: i < 12 ? '#ef4444' : i < 24 ? '#f59e0b' : '#10b981', opacity: 0.8 }} />
+              ))}
+            </div>
+            <div style={{ fontSize: '0.65rem', color: '#64748b', marginTop: 6 }}>37/37 connected</div>
+          </FloatingCard>
+
+          {/* Connection lines SVG */}
+          <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', opacity: 0.3 }}>
+            <line x1="110" y1="85" x2="180" y2="150" stroke="#6366f1" strokeWidth="1" strokeDasharray="4 4" />
+            <line x1="240" y1="50" x2="210" y2="140" stroke="#6366f1" strokeWidth="1" strokeDasharray="4 4" />
+            <line x1="180" y1="200" x2="220" y2="240" stroke="#10b981" strokeWidth="1" strokeDasharray="4 4" />
+          </svg>
         </div>
       </section>
 
+      {/* Live Ticker Bar */}
+      <div style={{ position: 'relative', zIndex: 5, overflow: 'hidden', borderTop: '1px solid rgba(255,255,255,0.04)', borderBottom: '1px solid rgba(255,255,255,0.04)', padding: '10px 0', marginBottom: 40 }}>
+        <div style={{ display: 'flex', gap: 48, animation: 'scroll 30s linear infinite', whiteSpace: 'nowrap' }}>
+          {['Chennai: HIGH (78)', 'Madurai: MEDIUM (52)', 'Coimbatore: LOW (28)', 'Tiruchirappalli: MEDIUM (45)', 'Salem: LOW (22)', 'Tirunelveli: HIGH (71)', 'Vellore: MEDIUM (48)', 'Thanjavur: LOW (31)', 'Thoothukudi: HIGH (82)', 'Cuddalore: MEDIUM (55)', 'Nagapattinam: HIGH (74)', 'Nilgiris: LOW (15)'].map((item, i) => {
+            const isHigh = item.includes('HIGH');
+            const isMed = item.includes('MEDIUM');
+            return (
+              <span key={i} style={{ fontSize: '0.72rem', fontWeight: 600, color: isHigh ? '#fca5a5' : isMed ? '#fcd34d' : '#6ee7b7' }}>
+                {item}
+              </span>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Features Section */}
-      <section style={{ position: 'relative', zIndex: 5, padding: '60px 48px 80px', maxWidth: 1300, margin: '0 auto' }}>
+      <section style={{ position: 'relative', zIndex: 5, padding: '60px 32px 80px', maxWidth: '100%', margin: '0 auto' }}>
         <div style={{ textAlign: 'center', marginBottom: 48 }}>
           <h2 style={{ fontSize: '2rem', fontWeight: 800, letterSpacing: '-0.03em', marginBottom: 12 }}>
             Complete Disease Surveillance Platform
@@ -233,7 +266,7 @@ export default function LandingPage() {
       </section>
 
       {/* Tamil Nadu Banner */}
-      <section style={{ position: 'relative', zIndex: 5, padding: '60px 48px', maxWidth: 1300, margin: '0 auto' }}>
+      <section style={{ position: 'relative', zIndex: 5, padding: '60px 32px', maxWidth: '100%', margin: '0 auto' }}>
         <div style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.08), rgba(6,182,212,0.05))', border: '1px solid rgba(99,102,241,0.15)', borderRadius: 20, padding: '48px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 40, alignItems: 'center' }}>
           <div>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 10, marginBottom: 16, padding: '6px 14px', background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.2)', borderRadius: 20 }}>
@@ -298,6 +331,7 @@ export default function LandingPage() {
         @keyframes float3 { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-15px, -25px); } }
         @keyframes floatCard { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
         @keyframes livePulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
       `}</style>
     </div>
   );
