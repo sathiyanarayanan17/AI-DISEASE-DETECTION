@@ -27,16 +27,16 @@ import Sparkline from '../components/common/Sparkline';
 import RiskBadge from '../components/common/RiskBadge';
 import LiveTicker from '../components/layout/LiveTicker';
 import FloatingStatusWidget from '../components/common/FloatingStatusWidget';
+import { useTheme } from '../context/ThemeContext';
 
 export const LandingPage = () => {
   const highRisk = getHighRiskDistricts();
   const topDistricts = DISTRICTS_DATA.slice(0, 6);
-  const [darkMode, setDarkMode] = useState(true);
+  const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
-  const toggleTheme = () => {
-    setDarkMode(!darkMode);
-    document.documentElement.classList.toggle('light-theme');
+  const toggleThemeHandler = () => {
+    toggleTheme();
   };
 
   const stats = [
@@ -153,12 +153,12 @@ export const LandingPage = () => {
           </button>
 
           {/* Theme Toggle */}
-          <button onClick={toggleTheme} style={{
+          <button onClick={toggleThemeHandler} style={{
             background: 'var(--bg-input)', border: '1px solid var(--border-base)',
             borderRadius: 8, padding: '7px 10px', cursor: 'pointer',
             display: 'flex', alignItems: 'center', color: 'var(--text-secondary)'
           }} title="Toggle theme">
-            {darkMode ? <Sun size={16} /> : <Moon size={16} />}
+            {isDark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
 
           {/* Notifications */}
