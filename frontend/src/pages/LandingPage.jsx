@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ShieldAlert,
@@ -15,7 +15,12 @@ import {
   Globe,
   Droplets,
   Thermometer,
-  Wind
+  Wind,
+  Sun,
+  Moon,
+  LogIn,
+  User,
+  Search
 } from 'lucide-react';
 import { DISTRICTS_DATA, getHighRiskDistricts } from '../data/districtsData';
 import Sparkline from '../components/common/Sparkline';
@@ -26,6 +31,12 @@ import FloatingStatusWidget from '../components/common/FloatingStatusWidget';
 export const LandingPage = () => {
   const highRisk = getHighRiskDistricts();
   const topDistricts = DISTRICTS_DATA.slice(0, 6);
+  const [darkMode, setDarkMode] = useState(true);
+
+  const toggleTheme = () => {
+    setDarkMode(!darkMode);
+    document.documentElement.classList.toggle('light-theme');
+  };
 
   const stats = [
     { label: "Districts Monitored", value: "37", sub: "100% Tamil Nadu Coverage" },
@@ -86,7 +97,113 @@ export const LandingPage = () => {
 
   return (
     <div className="app-container grid-bg" style={{ display: 'block', overflow: 'auto', height: '100vh' }}>
-      {/* Live District Ticker at top */}
+      
+      {/* TOP NAVBAR */}
+      <nav style={{
+        display: 'flex', alignItems: 'center', padding: '12px 32px',
+        borderBottom: '1px solid var(--border-base)',
+        background: 'var(--bg-surface)',
+        position: 'sticky', top: 0, zIndex: 50,
+        backdropFilter: 'blur(12px)'
+      }}>
+        {/* Logo */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{
+            width: 34, height: 34, borderRadius: 8,
+            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-purple))',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '0.72rem', fontWeight: 800, color: '#fff',
+            boxShadow: '0 0 16px rgba(99,102,241,0.3)'
+          }}>VS</div>
+          <span style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-primary)' }}>VyaadhiShield</span>
+          <span style={{
+            fontSize: '0.58rem', background: 'var(--accent-primary)', color: '#fff',
+            padding: '2px 7px', borderRadius: 4, fontWeight: 700
+          }}>AI</span>
+        </div>
+
+        {/* Nav Links */}
+        <div style={{ display: 'flex', gap: '24px', marginLeft: '40px' }}>
+          {[
+            { label: 'Dashboard', to: '/dashboard' },
+            { label: 'Alerts', to: '/alerts' },
+            { label: 'Analytics', to: '/analytics' },
+            { label: 'Forecast', to: '/forecast' },
+            { label: 'Districts', to: '/ranking' },
+          ].map(item => (
+            <Link key={item.label} to={item.to} style={{
+              fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 500,
+              textDecoration: 'none', transition: 'color 0.2s'
+            }}>{item.label}</Link>
+          ))}
+        </div>
+
+        {/* Right side */}
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* Search */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '6px',
+            background: 'var(--bg-input)', border: '1px solid var(--border-base)',
+            borderRadius: 8, padding: '6px 12px', fontSize: '0.75rem', color: 'var(--text-muted)',
+            cursor: 'pointer', minWidth: 160
+          }}>
+            <Search size={14} />
+            <span>Search districts...</span>
+          </div>
+
+          {/* Theme Toggle */}
+          <button onClick={toggleTheme} style={{
+            background: 'var(--bg-input)', border: '1px solid var(--border-base)',
+            borderRadius: 8, padding: '7px 10px', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', color: 'var(--text-secondary)'
+          }}>
+            {darkMode ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
+
+          {/* Notifications */}
+          <button style={{
+            background: 'var(--bg-input)', border: '1px solid var(--border-base)',
+            borderRadius: 8, padding: '7px 10px', cursor: 'pointer',
+            display: 'flex', alignItems: 'center', color: 'var(--text-secondary)',
+            position: 'relative'
+          }}>
+            <Bell size={16} />
+            <span style={{
+              position: 'absolute', top: -2, right: -2,
+              width: 14, height: 14, borderRadius: '50%',
+              background: 'var(--risk-high)', color: '#fff',
+              fontSize: '0.55rem', fontWeight: 700,
+              display: 'flex', alignItems: 'center', justifyContent: 'center'
+            }}>{highRisk.length}</span>
+          </button>
+
+          {/* Login Button */}
+          <Link to="/login" style={{
+            display: 'flex', alignItems: 'center', gap: '6px',
+            background: 'var(--bg-input)', border: '1px solid var(--border-base)',
+            borderRadius: 8, padding: '7px 14px',
+            fontSize: '0.78rem', fontWeight: 600, color: 'var(--text-secondary)',
+            textDecoration: 'none', transition: 'all 0.2s'
+          }}>
+            <User size={14} />
+            <span>Login</span>
+          </Link>
+
+          {/* CTA */}
+          <Link to="/dashboard" style={{
+            display: 'flex', alignItems: 'center', gap: '6px',
+            background: 'var(--accent-primary)', border: 'none',
+            borderRadius: 8, padding: '8px 16px',
+            fontSize: '0.78rem', fontWeight: 700, color: '#fff',
+            textDecoration: 'none', boxShadow: '0 4px 12px rgba(99,102,241,0.3)'
+          }}>
+            <Activity size={14} />
+            <span>Go to App</span>
+          </Link>
+        </div>
+      </nav>
+
+      {/* Live District Ticker */}
       <LiveTicker />
 
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '24px 32px' }}>
