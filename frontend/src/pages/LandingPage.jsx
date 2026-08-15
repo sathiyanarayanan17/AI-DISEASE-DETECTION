@@ -507,28 +507,208 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      {/* 6. FOOTER */}
+      {/* 6. QUICK ACCESS - ALL FEATURES GRID */}
+      <section style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginTop: '48px' }}>
+        <div style={{ textAlign: 'center' }}>
+          <h2 style={{ fontSize: '24px', marginBottom: '6px' }}>Complete Platform Features</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>Click any feature to explore</p>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+          {[
+            { label: 'Live Dashboard', to: '/dashboard', color: '#6366f1' },
+            { label: 'Active Alerts', to: '/alerts', color: '#ef4444' },
+            { label: '7-Day Forecast', to: '/forecast', color: '#06b6d4' },
+            { label: 'Real-Time Feed', to: '/realtime', color: '#10b981' },
+            { label: 'What-If Simulator', to: '/what-if', color: '#8b5cf6' },
+            { label: 'Outbreak Probability', to: '/outbreak-prob', color: '#f43f5e' },
+            { label: 'Anomaly Detection', to: '/anomaly', color: '#f59e0b' },
+            { label: 'Heatmap Calendar', to: '/heatmap', color: '#14b8a6' },
+            { label: 'Timeline Playback', to: '/timeline', color: '#a855f7' },
+            { label: 'District Ranking', to: '/ranking', color: '#ec4899' },
+            { label: 'Compare Districts', to: '/compare', color: '#3b82f6' },
+            { label: 'Correlations', to: '/correlation', color: '#22c55e' },
+            { label: 'Dengue Tracker', to: '/disease/dengue', color: '#eab308' },
+            { label: 'Cholera Tracker', to: '/disease/cholera', color: '#0ea5e9' },
+            { label: 'Malaria Tracker', to: '/disease/malaria', color: '#84cc16' },
+            { label: 'Voice Alerts', to: '/voice-alerts', color: '#d946ef' },
+            { label: 'SMS Alerts', to: '/sms-alerts', color: '#f97316' },
+            { label: 'WhatsApp Bot', to: '/whatsapp', color: '#22c55e' },
+            { label: 'Email Reports', to: '/email-scheduler', color: '#6366f1' },
+            { label: 'PDF Reports', to: '/reports', color: '#0891b2' },
+            { label: 'Citizen Report', to: '/citizen-report', color: '#8b5cf6' },
+            { label: 'Resource Allocation', to: '/resources', color: '#ef4444' },
+            { label: 'Nearby Hospitals', to: '/hospitals', color: '#10b981' },
+            { label: 'Budget Estimator', to: '/budget', color: '#f59e0b' },
+            { label: 'Prevention Tips', to: '/prevention', color: '#06b6d4' },
+            { label: 'Public Dashboard', to: '/public', color: '#3b82f6' },
+            { label: 'Model Versions', to: '/model-versions', color: '#a855f7' },
+            { label: 'API Monitor', to: '/api-monitor', color: '#14b8a6' },
+            { label: 'Audit Trail', to: '/audit', color: '#64748b' },
+            { label: 'Deployment', to: '/deploy', color: '#0ea5e9' },
+            { label: 'Settings', to: '/settings', color: '#6b7280' },
+            { label: 'Login / Roles', to: '/login', color: '#6366f1' },
+          ].map(item => (
+            <Link key={item.label} to={item.to} style={{
+              padding: '12px 14px', borderRadius: '10px',
+              background: 'var(--bg-input)', border: '1px solid var(--border-base)',
+              textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px',
+              transition: 'all 0.2s', cursor: 'pointer'
+            }}>
+              <div style={{ width: 8, height: 8, borderRadius: '50%', background: item.color, flexShrink: 0 }} />
+              <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>{item.label}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* 7. DISEASE OVERVIEW CARDS */}
+      <section style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginTop: '48px' }}>
+        {[
+          { name: 'Dengue', cases: '2,847', trend: '+18%', peak: 'Oct-Dec', vector: 'Aedes mosquito', color: '#f59e0b', to: '/disease/dengue' },
+          { name: 'Cholera', cases: '1,203', trend: '-5%', peak: 'Nov-Jan', vector: 'Contaminated water', color: '#3b82f6', to: '/disease/cholera' },
+          { name: 'Malaria', cases: '986', trend: '+8%', peak: 'Jul-Sep', vector: 'Anopheles mosquito', color: '#10b981', to: '/disease/malaria' },
+        ].map(d => (
+          <Link key={d.name} to={d.to} className="glass-card interactive" style={{ padding: '24px', textDecoration: 'none' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: 700 }}>{d.name}</h3>
+              <div style={{ width: 10, height: 10, borderRadius: '50%', background: d.color, boxShadow: `0 0 8px ${d.color}` }} />
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '2px' }}>Total Cases (30d)</div>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--text-primary)' }}>{d.cases}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '2px' }}>Trend</div>
+                <div style={{ fontSize: '16px', fontWeight: 700, color: d.trend.startsWith('+') ? '#ef4444' : '#10b981' }}>{d.trend}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '2px' }}>Peak Season</div>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>{d.peak}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '2px' }}>Vector</div>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text-primary)' }}>{d.vector}</div>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </section>
+
+      {/* 8. HOW IT WORKS */}
+      <section style={{ marginTop: '48px' }}>
+        <h2 style={{ fontSize: '24px', textAlign: 'center', marginBottom: '24px' }}>How VyaadhiShield Works</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+          {[
+            { step: '1', title: 'Data Ingestion', desc: 'IMD weather + IDSP disease data flows in real-time from 37 districts', color: '#6366f1' },
+            { step: '2', title: 'Feature Engineering', desc: '25 features: rolling averages, lags, trends, monsoon flags, geography', color: '#06b6d4' },
+            { step: '3', title: 'ML Prediction', desc: 'XGBoost ensemble classifies risk as Low/Medium/High with 97.2% F1', color: '#10b981' },
+            { step: '4', title: 'Alert Dispatch', desc: 'SMS, WhatsApp, Voice alerts sent to health officers within seconds', color: '#ef4444' },
+          ].map(s => (
+            <div key={s.step} className="glass-card" style={{ padding: '20px', textAlign: 'center' }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: '50%', background: s.color,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                margin: '0 auto 12px', fontSize: '14px', fontWeight: 800, color: '#fff',
+                boxShadow: `0 0 12px ${s.color}40`
+              }}>{s.step}</div>
+              <h4 style={{ fontSize: '14px', fontWeight: 700, marginBottom: '6px' }}>{s.title}</h4>
+              <p style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>{s.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 9. KEY METRICS DASHBOARD PREVIEW */}
+      <section className="glass-card" style={{ padding: '28px', marginTop: '48px' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '16px' }}>Model Performance Metrics</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '14px' }}>
+          {[
+            { label: 'F1 Score', value: '97.2%', color: '#6366f1' },
+            { label: 'ROC-AUC', value: '99.8%', color: '#10b981' },
+            { label: 'Accuracy', value: '97.4%', color: '#06b6d4' },
+            { label: 'Precision', value: '96.3%', color: '#8b5cf6' },
+            { label: 'Recall', value: '96.0%', color: '#f59e0b' },
+          ].map(m => (
+            <div key={m.label} style={{ textAlign: 'center', padding: '14px', background: 'var(--bg-input)', borderRadius: '10px' }}>
+              <div style={{ fontSize: '22px', fontWeight: 800, color: m.color }}>{m.value}</div>
+              <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px', fontWeight: 600 }}>{m.label}</div>
+              <div style={{ marginTop: '8px', height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, overflow: 'hidden' }}>
+                <div style={{ width: m.value, height: '100%', background: m.color, borderRadius: 2 }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 10. CTA BANNER */}
+      <section style={{
+        marginTop: '48px', padding: '40px', borderRadius: '16px', textAlign: 'center',
+        background: 'linear-gradient(135deg, rgba(99,102,241,0.12), rgba(6,182,212,0.08))',
+        border: '1px solid rgba(99,102,241,0.2)'
+      }}>
+        <h2 style={{ fontSize: '24px', marginBottom: '10px' }}>Ready to Monitor Tamil Nadu?</h2>
+        <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '20px' }}>
+          Access real-time disease surveillance data across all 37 districts. Free for government health officials.
+        </p>
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+          <Link to="/dashboard" className="btn btn-primary" style={{ padding: '12px 28px', fontSize: '14px' }}>
+            <Activity size={16} />
+            <span>Launch Dashboard</span>
+          </Link>
+          <Link to="/citizen-report" className="btn btn-secondary" style={{ padding: '12px 28px', fontSize: '14px' }}>
+            <FileText size={16} />
+            <span>Report Symptoms</span>
+          </Link>
+          <Link to="/public" className="btn btn-secondary" style={{ padding: '12px 28px', fontSize: '14px' }}>
+            <Globe size={16} />
+            <span>Public Portal</span>
+          </Link>
+        </div>
+      </section>
+
+      {/* 11. FOOTER */}
       <footer
         style={{
           borderTop: '1px solid var(--border-base)',
           paddingTop: '28px',
-          marginTop: '64px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '16px',
+          marginTop: '48px',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: '24px',
           fontSize: '12px',
-          color: 'var(--text-muted)'
+          color: 'var(--text-muted)',
+          paddingBottom: '32px'
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <ShieldAlert size={16} className="text-indigo-400" />
-          <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>VyaadhiShield AI</span>
-          <span>(TN Health Surveillance Platform)</span>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+            <ShieldAlert size={16} className="text-indigo-400" />
+            <span style={{ fontWeight: 700, fontSize: '14px', color: 'var(--text-primary)' }}>VyaadhiShield AI</span>
+          </div>
+          <p style={{ lineHeight: 1.6 }}>AI-powered disease outbreak early warning system for Tamil Nadu. Built for Smart India Hackathon (SIH).</p>
         </div>
         <div>
-          Official Public Health Portal for Tamil Nadu, India. All rights reserved.
+          <div style={{ fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '10px' }}>Platform</div>
+          {['Dashboard', 'Alerts', 'Forecast', 'Analytics', 'Real-Time'].map(l => (
+            <Link key={l} to={`/${l.toLowerCase().replace(' ', '-')}`} style={{ display: 'block', color: 'var(--text-muted)', textDecoration: 'none', padding: '3px 0' }}>{l}</Link>
+          ))}
+        </div>
+        <div>
+          <div style={{ fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '10px' }}>Tools</div>
+          {['What-If Simulator', 'Voice Alerts', 'SMS Alerts', 'Reports', 'Hospitals'].map(l => (
+            <Link key={l} to={`/${l.toLowerCase().replace(/ /g, '-')}`} style={{ display: 'block', color: 'var(--text-muted)', textDecoration: 'none', padding: '3px 0' }}>{l}</Link>
+          ))}
+        </div>
+        <div>
+          <div style={{ fontWeight: 700, color: 'var(--text-secondary)', marginBottom: '10px' }}>Contact</div>
+          <p style={{ lineHeight: 1.8 }}>
+            Directorate of Public Health<br />
+            Government of Tamil Nadu<br />
+            Chennai - 600006<br />
+            helpline: 104 / 108
+          </p>
         </div>
       </footer>
       </div>
