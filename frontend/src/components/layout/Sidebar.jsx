@@ -37,7 +37,10 @@ import {
   Flame,
   Droplet,
   Bug,
-  X
+  X,
+  Zap,
+  Satellite,
+  Dna
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAlerts } from '../../context/AlertContext';
@@ -90,6 +93,16 @@ export const Sidebar = ({ isOpen, onClose }) => {
         { path: '/outbreak-probability', label: t('outbreakProb'), icon: TrendingUp },
         { path: '/anomalies', label: t('anomalies'), icon: AlertTriangle },
         { path: '/analytics', label: t('analytics'), icon: BrainCircuit }
+      ]
+    },
+    {
+      key: 'novelty',
+      title: 'NOVELTY',
+      items: [
+        { path: '/outbreak-chain', label: 'Outbreak Chain Reaction', icon: Zap },
+        { path: '/triage', label: 'AI Triage Priority', icon: HeartPulse },
+        { path: '/satellite', label: 'Satellite Breeding Index', icon: Satellite },
+        { path: '/genetic-drift', label: 'Genetic Drift Alert', icon: Dna }
       ]
     },
     {

@@ -36,6 +36,10 @@ import AuditTrailPage from './pages/AuditTrailPage';
 import LoginPage from './pages/LoginPage';
 import SettingsPage from './pages/SettingsPage';
 import DockerDeployPage from './pages/DockerDeployPage';
+import OutbreakChainPage from './pages/OutbreakChainPage';
+import TriagePage from './pages/TriagePage';
+import SatellitePage from './pages/SatellitePage';
+import GeneticDriftPage from './pages/GeneticDriftPage';
 
 export const App = () => {
   return (
@@ -58,6 +62,10 @@ export const App = () => {
         <Route path="/what-if" element={<WhatIfPage />} />
         <Route path="/outbreak-probability" element={<OutbreakProbPage />} />
         <Route path="/anomalies" element={<AnomalyPage />} />
+        <Route path="/outbreak-chain" element={<OutbreakChainPage />} />
+        <Route path="/triage" element={<TriagePage />} />
+        <Route path="/satellite" element={<SatellitePage />} />
+        <Route path="/genetic-drift" element={<GeneticDriftPage />} />
 
         {/* 4. Visualizations */}
         <Route path="/heatmap" element={<HeatmapCalendarPage />} />

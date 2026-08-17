@@ -550,6 +550,10 @@ export const LandingPage = () => {
             { label: 'Deployment', to: '/deploy', color: '#0ea5e9' },
             { label: 'Settings', to: '/settings', color: '#6b7280' },
             { label: 'Login / Roles', to: '/login', color: '#6366f1' },
+            { label: 'Outbreak Chain Reaction', to: '/outbreak-chain', color: '#f43f5e' },
+            { label: 'AI Triage Priority', to: '/triage', color: '#ec4899' },
+            { label: 'Satellite Breeding Index', to: '/satellite', color: '#0ea5e9' },
+            { label: 'Genetic Drift Alert', to: '/genetic-drift', color: '#a855f7' },
           ].map(item => (
             <Link key={item.label} to={item.to} style={{
               padding: '12px 14px', borderRadius: '10px',
