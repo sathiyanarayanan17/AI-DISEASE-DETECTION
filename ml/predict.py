@@ -169,37 +169,46 @@ def _seasonal_values(district: str, day_of_year: int) -> dict:
     # Northeast monsoon signal (Oct-Dec, peaks around doy 305)
     ne_monsoon = max(0.0, math.sin(math.pi * (day_of_year - 270) / 90)) if 270 <= day_of_year <= 360 else 0.0
 
-    # Tamil Nadu gets more rain from NE monsoon (coastal districts especially)
     is_coastal = district in COASTAL_DISTRICTS
     is_hill = district in HILL_DISTRICTS
     is_urban = district in URBAN_DISTRICTS
 
-    coastal_factor = 1.5 if is_coastal else 1.0
-    hill_factor = 1.3 if is_hill else 1.0
+    coastal_factor = 1.8 if is_coastal else 1.0
+    hill_factor = 1.4 if is_hill else 1.0
+    urban_factor = 1.5 if is_urban else 1.0
 
-    # NE monsoon dominates in TN; SW monsoon is weaker here
-    monsoon_intensity = (sw_monsoon * 0.4 + ne_monsoon * 1.0) * coastal_factor * hill_factor
+    # District-specific seed for variety (so not all districts get same prediction)
+    district_hash = sum(ord(c) for c in district) % 100
+    district_variance = (district_hash / 100.0) * 0.6 + 0.7  # range 0.7 to 1.3
 
-    rainfall = round(monsoon_intensity * 20, 2)
+    # Both monsoons contribute significantly
+    monsoon_intensity = (sw_monsoon * 0.7 + ne_monsoon * 1.2) * coastal_factor * hill_factor * district_variance
+
+    # Base rainfall even outside monsoon (TN always has some rain)
+    base_rain = 5.0 + district_hash * 0.1
+    rainfall = round(base_rain + monsoon_intensity * 25, 2)
     temperature = round(30 + 5 * math.sin(2 * math.pi * (day_of_year - 100) / 365), 1)
     if is_hill:
         temperature = round(temperature - 10, 1)
-    humidity = round(min(98, 60 + 30 * monsoon_intensity), 1)
+    humidity = round(min(98, 55 + 35 * monsoon_intensity + district_hash * 0.1), 1)
 
-    # Case estimates scale with rainfall and humidity
-    case_factor = 2.5 if (152 <= day_of_year <= 360) else 1.0
-    rolling_7d = round((rainfall * 0.4 + humidity * 0.15) * case_factor, 2)
+    # Case estimates - urban and coastal get more cases
+    case_base = 5 + district_hash * 0.1  # base varies by district
+    case_monsoon_factor = 1.0 + monsoon_intensity * 1.0
+    case_urban_factor = 1.15 if is_urban else 1.0
+
+    rolling_7d = round((case_base + rainfall * 0.2 + humidity * 0.05) * case_monsoon_factor * case_urban_factor, 2)
     rolling_14d = round(rolling_7d * 1.05, 2)
     rolling_30d = round(rolling_7d * 1.10, 2)
-    lag_7 = round(rolling_7d * 0.9, 2)
-    lag_14 = round(rolling_7d * 0.8, 2)
-    lag_21 = round(rolling_7d * 0.7, 2)
+    lag_7 = round(rolling_7d * 0.85, 2)
+    lag_14 = round(rolling_7d * 0.75, 2)
+    lag_21 = round(rolling_7d * 0.65, 2)
     case_trend_7d = round(rolling_7d - lag_7, 2)
 
     # Disease-specific approximations
-    cholera_avg = round(rolling_7d * 0.15, 2)
+    cholera_avg = round(rolling_7d * 0.2, 2)
     dengue_avg = round(rolling_7d * 0.45, 2)
-    malaria_avg = round(rolling_7d * 0.25, 2)
+    malaria_avg = round(rolling_7d * 0.2, 2)
 
     rainfall_14d_avg = round(rainfall * 0.95, 2)
 
