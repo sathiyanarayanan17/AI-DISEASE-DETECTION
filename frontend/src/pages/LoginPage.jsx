@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   LogIn,
   ShieldCheck,
@@ -142,6 +142,11 @@ export const LoginPage = () => {
               Sign Out of Active Session ({user.name})
             </button>
           )}
+
+          <div style={{ textAlign: 'center', fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }}>
+            Don't have an account?{' '}
+            <Link to="/signup" style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>Create Account</Link>
+          </div>
         </div>
 
         {/* Role Privileges Cards */}

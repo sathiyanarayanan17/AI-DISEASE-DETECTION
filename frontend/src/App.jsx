@@ -114,6 +114,7 @@ import AadhaarVerifyPage from './pages/AadhaarVerifyPage';
 import AutoRetrainPage from './pages/AutoRetrainPage';
 import IHIPIntegrationPage from './pages/IHIPIntegrationPage';
 import OfflinePWAPage from './pages/OfflinePWAPage';
+import SignupPage from './pages/SignupPage';
 
 export const App = () => {
   return (
@@ -225,6 +226,7 @@ export const App = () => {
         <Route path="/aadhaar-verify" element={<AadhaarVerifyPage />} />
         <Route path="/ihip-integration" element={<IHIPIntegrationPage />} />
         <Route path="/offline-pwa" element={<OfflinePWAPage />} />
+        <Route path="/signup" element={<SignupPage />} />
 
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Route>
