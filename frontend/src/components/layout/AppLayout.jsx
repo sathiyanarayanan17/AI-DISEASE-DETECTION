@@ -5,6 +5,7 @@ import Topbar from './Topbar';
 import LiveTicker from './LiveTicker';
 import QuickSearchModal from '../common/QuickSearchModal';
 import FloatingStatusWidget from '../common/FloatingStatusWidget';
+import AIChatAgent from '../common/AIChatAgent';
 import { useAlerts } from '../../context/AlertContext';
 
 export const AppLayout = () => {
@@ -38,6 +39,9 @@ export const AppLayout = () => {
         onClose={() => setSearchModalOpen(false)}
       />
 
+      {/* AI Chat Agent — Floating on all pages */}
+      <AIChatAgent />
+
       {/* Toast Notification Container */}
       <div
         style={{
@@ -56,12 +60,12 @@ export const AppLayout = () => {
             className="glass-card"
             style={{
               padding: '12px 18px',
-              borderRadius: '10px',
+              borderRadius: '12px',
               borderLeft: `4px solid ${toast.type === 'error' ? 'var(--risk-high)' : 'var(--accent-primary)'}`,
               boxShadow: 'var(--shadow-lg)',
               minWidth: '280px',
               maxWidth: '380px',
-              animation: 'float-slow 0.3s ease'
+              animation: 'slideInRight 0.3s ease'
             }}
           >
             <div style={{ fontWeight: 600, fontSize: '13px', color: 'var(--text-primary)', marginBottom: '2px' }}>

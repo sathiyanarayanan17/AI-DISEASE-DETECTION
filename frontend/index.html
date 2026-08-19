@@ -6,6 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>VyaadhiShield AI - Disease Outbreak Early Warning Platform</title>
     <meta name="description" content="AI-Powered Disease Outbreak Early Warning System for Tamil Nadu, India. Predicting Dengue, Cholera, and Malaria using XGBoost ML with 97.2% accuracy." />
+    <meta name="theme-color" content="#6366f1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="VyaadhiShield" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,5 +25,20 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('[VyaadhiShield] SW registered:', registration.scope);
+            })
+            .catch((error) => {
+              console.log('[VyaadhiShield] SW registration failed:', error);
+            });
+        });
+      }
+    </script>
   </body>
 </html>

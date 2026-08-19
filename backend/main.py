@@ -51,6 +51,11 @@ from routes.forecast import router as forecast_router    # noqa: E402
 from routes.citizen import router as citizen_router      # noqa: E402
 from routes.resources import router as resources_router  # noqa: E402
 from routes.disease import router as disease_router      # noqa: E402
+from routes.water_quality import router as water_quality_router  # noqa: E402
+from routes.vaccination import router as vaccination_router      # noqa: E402
+from routes.mosquito import router as mosquito_router            # noqa: E402
+from routes.notifications import router as notifications_router  # noqa: E402
+from routes.agent import router as agent_router                  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # Application state
@@ -97,6 +102,11 @@ app.include_router(forecast_router, prefix="/forecast")
 app.include_router(citizen_router, prefix="/citizen")
 app.include_router(resources_router, prefix="/resources")
 app.include_router(disease_router, prefix="/disease")
+app.include_router(water_quality_router, prefix="/water-quality")
+app.include_router(vaccination_router, prefix="/vaccination")
+app.include_router(mosquito_router, prefix="/mosquito")
+app.include_router(notifications_router, prefix="/notifications")
+app.include_router(agent_router, prefix="/agent")
 
 
 # ---------------------------------------------------------------------------

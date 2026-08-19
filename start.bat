@@ -1,29 +1,63 @@
 @echo off
-title EarlyAlert - AI Disease Outbreak Warning System
+REM ═══════════════════════════════════════════════════════════════════
+REM  VyaadhiShield AI — Full Stack Launcher
+REM  Starts both Backend (FastAPI) and Frontend (React/Vite)
+REM ═══════════════════════════════════════════════════════════════════
+
+title VyaadhiShield AI - Full Application
+
 echo.
-echo ============================================================
-echo   EarlyAlert - Starting Backend + Frontend
-echo ============================================================
+echo  ╔═══════════════════════════════════════════════════════════════╗
+echo  ║     VyaadhiShield AI - Disease Outbreak Early Warning        ║
+echo  ║     45+ Feature Full Stack Application                       ║
+echo  ╚═══════════════════════════════════════════════════════════════╝
 echo.
 
-:: Start Backend
-echo [1/2] Starting Backend (FastAPI) on port 8000...
-cd /d "C:\Users\SATHIYANARAYANAN S\early-warning-system\backend"
-start "EarlyAlert-Backend" cmd /k "uvicorn main:app --reload --port 8000"
+REM Check Python
+python --version >nul 2>&1
+if errorlevel 1 (
+    echo [ERROR] Python not found. Install Python 3.10+
+    pause
+    exit /b 1
+)
 
-:: Wait for backend to boot
+REM Check Node
+node --version >nul 2>&1
+if errorlevel 1 (
+    echo [ERROR] Node.js not found. Install Node.js 18+
+    pause
+    exit /b 1
+)
+
+echo [1/4] Installing backend dependencies...
+cd backend
+pip install -r requirements.txt -q
+cd ..
+
+echo [2/4] Installing frontend dependencies...
+cd frontend
+call npm install --silent
+cd ..
+
+echo [3/4] Starting FastAPI backend (port 8000)...
+start "VyaadhiShield Backend" cmd /k "cd backend && uvicorn main:app --reload --host 0.0.0.0 --port 8000"
+
+REM Wait for backend to start
 timeout /t 3 /nobreak >nul
 
-:: Start Frontend
-echo [2/2] Starting Frontend (React) on port 3000...
-cd /d "C:\Users\SATHIYANARAYANAN S\early-warning-system\frontend"
-start "EarlyAlert-Frontend" cmd /k "npm start"
+echo [4/4] Starting React frontend (port 3000)...
+start "VyaadhiShield Frontend" cmd /k "cd frontend && npm run dev -- --port 3000"
 
 echo.
-echo ============================================================
-echo   DONE! Opening in 5 seconds...
-echo   Backend:  http://localhost:8000/docs
-echo   Frontend: http://localhost:3000
-echo ============================================================
-timeout /t 5 /nobreak >nul
-start http://localhost:3000
+echo  ═══════════════════════════════════════════════════════════
+echo   Application Started Successfully!
+echo  ═══════════════════════════════════════════════════════════
+echo.
+echo   Frontend:  http://localhost:3000
+echo   Backend:   http://localhost:8000
+echo   API Docs:  http://localhost:8000/docs
+echo   WebSocket: ws://localhost:8000/ws
+echo.
+echo   Press any key to exit this launcher (servers keep running)
+echo  ═══════════════════════════════════════════════════════════
+pause

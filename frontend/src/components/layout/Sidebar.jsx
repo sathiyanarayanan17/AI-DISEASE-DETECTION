@@ -40,7 +40,20 @@ import {
   X,
   Zap,
   Satellite,
-  Dna
+  Dna,
+  Syringe,
+  Link2,
+  FlaskConical,
+  Download,
+  HelpCircle,
+  BellRing,
+  Waves,
+  CircleDot,
+  Fingerprint,
+  Globe,
+  RotateCcw,
+  WifiOff,
+  MapPin
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAlerts } from '../../context/AlertContext';
@@ -73,7 +86,8 @@ export const Sidebar = ({ isOpen, onClose }) => {
         { path: '/dashboard', label: t('dashboard'), icon: LayoutDashboard },
         { path: '/alerts', label: t('alerts'), icon: Bell, badge: unreadCount > 0 ? unreadCount : null },
         { path: '/forecast', label: t('forecast'), icon: Calendar },
-        { path: '/realtime', label: t('realtime'), icon: Radio, pulse: true }
+        { path: '/realtime', label: t('realtime'), icon: Radio, pulse: true },
+        { path: '/notifications', label: 'Notifications', icon: BellRing }
       ]
     },
     {
@@ -92,7 +106,10 @@ export const Sidebar = ({ isOpen, onClose }) => {
         { path: '/what-if', label: t('whatIf'), icon: Sliders },
         { path: '/outbreak-probability', label: t('outbreakProb'), icon: TrendingUp },
         { path: '/anomalies', label: t('anomalies'), icon: AlertTriangle },
-        { path: '/analytics', label: t('analytics'), icon: BrainCircuit }
+        { path: '/analytics', label: t('analytics'), icon: BrainCircuit },
+        { path: '/epidemic-simulator', label: 'Epidemic Simulator', icon: FlaskConical },
+        { path: '/lstm-forecast', label: 'LSTM Deep Learning', icon: BrainCircuit },
+        { path: '/r0-calculator', label: 'R\u2080 Calculator', icon: TrendingUp }
       ]
     },
     {
@@ -103,6 +120,17 @@ export const Sidebar = ({ isOpen, onClose }) => {
         { path: '/triage', label: 'AI Triage Priority', icon: HeartPulse },
         { path: '/satellite', label: 'Satellite Breeding Index', icon: Satellite },
         { path: '/genetic-drift', label: 'Genetic Drift Alert', icon: Dna }
+      ]
+    },
+    {
+      key: 'surveillance',
+      title: 'Environmental Surveillance',
+      items: [
+        { path: '/water-quality', label: 'Water Quality Monitor', icon: Waves },
+        { path: '/mosquito-density', label: 'Mosquito Density Index', icon: CircleDot },
+        { path: '/symptom-heatmap', label: 'Symptom Heatmap', icon: Grid },
+        { path: '/social-media', label: 'Social Media Intel', icon: Globe },
+        { path: '/pharmacy-sales', label: 'Pharmacy Sales', icon: Package }
       ]
     },
     {
@@ -134,7 +162,36 @@ export const Sidebar = ({ isOpen, onClose }) => {
         { path: '/resources', label: t('resources'), icon: Package },
         { path: '/hospitals', label: t('hospitals'), icon: Building2 },
         { path: '/citizen-report', label: t('citizenReport'), icon: UserCheck },
-        { path: '/budget', label: t('budget'), icon: Calculator }
+        { path: '/budget', label: t('budget'), icon: Calculator },
+        { path: '/vaccination', label: 'Vaccination Tracker', icon: Syringe },
+        { path: '/contact-tracing', label: 'Contact Tracing', icon: Link2 },
+        { path: '/supply-chain', label: 'Supply Chain', icon: Package },
+        { path: '/field-workers', label: 'Field Workers GPS', icon: MapPin },
+        { path: '/telemedicine', label: 'Telemedicine', icon: Building2 },
+        { path: '/mortality', label: 'Mortality Tracker', icon: HeartPulse },
+        { path: '/genomic-surveillance', label: 'Genomic Surveillance', icon: Dna }
+      ]
+    },
+    {
+      key: 'integration',
+      title: 'Integration & Identity',
+      items: [
+        { path: '/aadhaar-verify', label: 'Aadhaar Verification', icon: Fingerprint },
+        { path: '/ihip-integration', label: 'IHIP Integration', icon: Globe },
+        { path: '/auto-retrain', label: 'Auto Retrain ML', icon: RotateCcw },
+        { path: '/offline-pwa', label: 'Offline / PWA Mode', icon: WifiOff }
+      ]
+    },
+    {
+      key: 'advanced',
+      title: 'Advanced Analytics',
+      items: [
+        { path: '/spatial-clustering', label: 'Spatial Clustering', icon: Grid },
+        { path: '/network-analysis', label: 'Network Analysis', icon: Link2 },
+        { path: '/survival-analysis', label: 'Survival Analysis', icon: TrendingUp },
+        { path: '/geo-fencing', label: 'Geo-Fencing Alerts', icon: MapPin },
+        { path: '/custom-dashboard', label: 'Custom Dashboard', icon: LayoutDashboard },
+        { path: '/kpi-scorecard', label: 'KPI Scorecard', icon: Award }
       ]
     },
     {
@@ -147,6 +204,8 @@ export const Sidebar = ({ isOpen, onClose }) => {
         { path: '/api-monitor', label: t('apiMonitor'), icon: ActivitySquare },
         { path: '/audit', label: t('audit'), icon: ShieldCheck },
         { path: '/deploy', label: t('deploy'), icon: Server },
+        { path: '/data-export', label: 'Data Export Hub', icon: Download },
+        { path: '/help', label: 'Help & Docs', icon: HelpCircle },
         { path: '/settings', label: t('settings'), icon: Settings },
         { path: '/login', label: t('login'), icon: LogIn }
       ]
@@ -183,18 +242,19 @@ export const Sidebar = ({ isOpen, onClose }) => {
           top: 0,
           zIndex: 1100,
           transition: 'transform var(--transition-normal)',
-          overflowY: 'auto'
+          overflowY: 'auto',
+          background: 'linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-main) 100%)'
         }}
       >
         {/* Brand Header */}
         <div
           style={{
-            padding: '18px 20px',
+            padding: '20px 20px',
             borderBottom: '1px solid var(--border-base)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            background: 'var(--bg-surface)'
+            background: 'transparent'
           }}
         >
           <NavLink to="/" onClick={onClose} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

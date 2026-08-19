@@ -158,11 +158,11 @@ def load_model():
 
 
 # -- Seasonal averages (heuristic when real-time data is unavailable) -------
-def _seasonal_values(district: str, day_of_year: int) -> dict:
+def _seasonal_values(district: str, day_of_year: int, actual_rainfall: float = None, actual_temperature: float = None, actual_humidity: float = None) -> dict:
     """
     Return approximate seasonal weather and case values for a district
-    on the given day-of-year. These are rough heuristics used to fill
-    rolling/lag features when live data is unavailable.
+    on the given day-of-year. When actual weather values are provided,
+    uses them to drive case estimates for accurate predictions.
     """
     # Southwest monsoon signal (Jun-Sep, peaks around doy 213)
     sw_monsoon = max(0.0, math.sin(math.pi * (day_of_year - 150) / 120)) if 150 <= day_of_year <= 270 else 0.0
@@ -192,25 +192,44 @@ def _seasonal_values(district: str, day_of_year: int) -> dict:
         temperature = round(temperature - 10, 1)
     humidity = round(min(98, 55 + 35 * monsoon_intensity + district_hash * 0.1), 1)
 
-    # Case estimates - urban and coastal get more cases
-    case_base = 5 + district_hash * 0.1  # base varies by district
-    case_monsoon_factor = 1.0 + monsoon_intensity * 1.0
+    # Case estimates - calibrated to match training data distributions
+    # Training data: Low~39 rolling cases, Medium~75, High~122
+    # Weather is the PRIMARY driver. District type adds modest bonus.
+    case_monsoon_factor = 1.0 + monsoon_intensity * 0.6
     case_urban_factor = 1.15 if is_urban else 1.0
+    case_coastal_factor = 1.1 if is_coastal else 1.0
 
-    rolling_7d = round((case_base + rainfall * 0.2 + humidity * 0.05) * case_monsoon_factor * case_urban_factor, 2)
+    # Use ACTUAL weather if provided, otherwise use seasonal estimates
+    eff_rainfall = actual_rainfall if actual_rainfall is not None else rainfall
+    eff_temperature = actual_temperature if actual_temperature is not None else temperature
+    eff_humidity = actual_humidity if actual_humidity is not None else humidity
+
+    # Weather intensity score drives case counts
+    rain_score = min(eff_rainfall / 15.0, 4.0)  # 0-4
+    hum_score = max(0, (eff_humidity - 55)) / 25.0  # 0-1.8
+    temp_score = max(0, (eff_temperature - 25)) / 12.0  # 0-1.25
+    
+    weather_intensity = rain_score * 3.0 + hum_score * 2.0 + temp_score * 1.0
+
+    # Base + weather → realistic case counts targeting Low~39, Med~75, High~122
+    rolling_7d = round(
+        (22.0 + weather_intensity * 7.5) * case_monsoon_factor * case_urban_factor * case_coastal_factor, 2
+    )
+    rolling_7d = max(13.0, min(380.0, rolling_7d))
+    
     rolling_14d = round(rolling_7d * 1.05, 2)
-    rolling_30d = round(rolling_7d * 1.10, 2)
-    lag_7 = round(rolling_7d * 0.85, 2)
-    lag_14 = round(rolling_7d * 0.75, 2)
-    lag_21 = round(rolling_7d * 0.65, 2)
+    rolling_30d = round(rolling_7d * 1.12, 2)
+    lag_7 = round(rolling_7d * 0.88, 2)
+    lag_14 = round(rolling_7d * 0.78, 2)
+    lag_21 = round(rolling_7d * 0.68, 2)
     case_trend_7d = round(rolling_7d - lag_7, 2)
 
-    # Disease-specific approximations
-    cholera_avg = round(rolling_7d * 0.2, 2)
-    dengue_avg = round(rolling_7d * 0.45, 2)
-    malaria_avg = round(rolling_7d * 0.2, 2)
+    # Disease-specific
+    dengue_avg = round(rolling_7d * 0.40, 2)
+    cholera_avg = round(rolling_7d * 0.25, 2)
+    malaria_avg = round(rolling_7d * 0.20, 2)
 
-    rainfall_14d_avg = round(rainfall * 0.95, 2)
+    rainfall_14d_avg = round(rainfall * 0.90, 2)
 
     return {
         "rainfall_mm": rainfall,
@@ -287,7 +306,7 @@ def predict_risk(
     feature_columns = metadata.get("feature_columns", FEATURE_COLUMNS)
 
     # Build seasonal estimates for rolling/lag features
-    seasonal = _seasonal_values(district, doy)
+    seasonal = _seasonal_values(district, doy, actual_rainfall=rainfall, actual_temperature=temperature, actual_humidity=humidity)
 
     # Geography flags
     is_coastal = 1 if district in COASTAL_DISTRICTS else 0
@@ -312,10 +331,10 @@ def predict_risk(
         "cholera_cases_7d_avg": seasonal["cholera_cases_7d_avg"],
         "dengue_cases_7d_avg": seasonal["dengue_cases_7d_avg"],
         "malaria_cases_7d_avg": seasonal["malaria_cases_7d_avg"],
-        "rainfall_7d_avg": (rainfall + seasonal["rainfall_7d_avg"]) / 2,
-        "rainfall_14d_avg": (rainfall + seasonal["rainfall_14d_avg"]) / 2,
-        "temp_7d_avg": (temperature + seasonal["temp_7d_avg"]) / 2,
-        "humidity_7d_avg": (humidity + seasonal["humidity_7d_avg"]) / 2,
+        "rainfall_7d_avg": rainfall,
+        "rainfall_14d_avg": rainfall * 0.92,
+        "temp_7d_avg": temperature,
+        "humidity_7d_avg": humidity,
         "month": month,
         "week_of_year": week_of_year,
         "day_of_year": doy,

@@ -1,0 +1,43 @@
+{
+  "name": "VyaadhiShield AI - Disease Outbreak Early Warning",
+  "short_name": "VyaadhiShield",
+  "description": "AI-powered district-level disease outbreak prediction system for Tamil Nadu",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#0a1128",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["health", "medical", "government"],
+  "lang": "en",
+  "dir": "ltr",
+  "scope": "/",
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "url": "/dashboard",
+      "description": "View disease outbreak surveillance dashboard"
+    },
+    {
+      "name": "Alerts",
+      "short_name": "Alerts",
+      "url": "/alerts",
+      "description": "View active outbreak alerts"
+    },
+    {
+      "name": "Report Symptoms",
+      "short_name": "Report",
+      "url": "/citizen-report",
+      "description": "Submit a citizen symptom report"
+    }
+  ]
+}

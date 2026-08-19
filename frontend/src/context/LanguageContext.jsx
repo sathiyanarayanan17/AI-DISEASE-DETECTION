@@ -47,7 +47,19 @@ const TRANSLATIONS = {
     liveTelemetry: "Live Telemetry Active",
     dengue: "Dengue",
     cholera: "Cholera",
-    malaria: "Malaria"
+    malaria: "Malaria",
+    vaccination: "Vaccination Tracker",
+    contactTracing: "Contact Tracing",
+    waterQuality: "Water Quality",
+    mosquitoDensity: "Mosquito Density",
+    epidemicSim: "Epidemic Simulator",
+    notifications: "Notifications",
+    dataExport: "Data Export",
+    help: "Help & Docs",
+    aadhaarVerify: "Aadhaar Verify",
+    ihipIntegration: "IHIP Integration",
+    autoRetrain: "Auto Retrain",
+    offlinePwa: "Offline Mode"
   },
   ta: {
     appTitle: "வியாதிஷீல்டு AI",
@@ -95,7 +107,19 @@ const TRANSLATIONS = {
     liveTelemetry: "நேரலை கண்காணிப்பு இயங்குகிறது",
     dengue: "டெங்கு",
     cholera: "காலரா",
-    malaria: "மலேரியா"
+    malaria: "மலேரியா",
+    vaccination: "தடுப்பூசி கண்காணிப்பு",
+    contactTracing: "தொடர்பு கண்டறிதல்",
+    waterQuality: "நீர் தரம் கண்காணிப்பு",
+    mosquitoDensity: "கொசு அடர்த்தி குறியீடு",
+    epidemicSim: "தொற்றுநோய் உருவகம்",
+    notifications: "அறிவிப்புகள்",
+    dataExport: "தரவு ஏற்றுமதி",
+    help: "உதவி & ஆவணங்கள்",
+    aadhaarVerify: "ஆதார் சரிபார்ப்பு",
+    ihipIntegration: "IHIP ஒருங்கிணைப்பு",
+    autoRetrain: "தானியங்கி மறு பயிற்சி",
+    offlinePwa: "ஆஃப்லைன் பயன்முறை"
   }
 };
 
